@@ -1,7 +1,9 @@
 import React from 'react';
+import {add,release} from '@src/utils/util.js'
+
 import './index.less'
 
-export default class PageA extends React.Component {
+export default class PageB extends React.Component {
   constructor(props) {
     super(props);
     this.state={
@@ -12,6 +14,7 @@ export default class PageA extends React.Component {
     return (
       <div className="content">我是PageBb-x--{this.state.a}
         <button onClick={()=>{this.setState({a:555})}}>DDD</button>
+        {add(2,3)+release(5,3)}
       </div>
     )
   }

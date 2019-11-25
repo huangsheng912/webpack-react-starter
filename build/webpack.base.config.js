@@ -6,6 +6,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const Happypack = require('happypack');
 const os = require('os');
 const happyThreadPool = Happypack.ThreadPool({size:os.cpus().length});
+const dev = process.env.NODE_ENV === 'development';
 
 module.exports = {
   entry: {},
@@ -13,10 +14,12 @@ module.exports = {
     path: path.resolve(__dirname,'../dist'),
   },
   resolve: {
-    extensions: ['.jsx', '.js', '.less', '.css'],//设置引入文件可省略的拓展名
+    extensions: ['.jsx', '.js', '.less', '.css', 'json'],//设置引入文件可省略的拓展名
     alias: {
-      "@src": path.resolve(__dirname,'../src'),  //设置引入路径别名
-    }
+      "src": path.resolve(__dirname,'../src'),  //设置引入路径别名
+      "utils": path.resolve(__dirname,'../src/utils'),
+    },
+    modules: ['node_modules'], //webpack解析模块时应该搜索的目录
   },
   module: {
     rules: [
@@ -30,20 +33,41 @@ module.exports = {
         ]
       },
       {
-        test: /\.(png|jpg|jpeg|gif|svg)/,
+        test: /\.(less|css)$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader:MiniCssExtractPlugin.loader,
+            options: {
+              hmr: dev,
+              reloadAll: true,
+            }
+          },
+          'css-loader', 'postcss-loader', 'less-loader'],
+      },
+      {
+        test: /\.(png|jpg|jpeg|gif|svg)$/,
+        exclude: /node_modules/,
         use: {
           loader: "url-loader",
           options: {
-            limit: 10240,
-            // outputPath: "images/", // 图片输出的路径
-            name:'images/[name]-[hash:8].[ext]',
+            limit: 10240, //超过限制的自动使用file-loader处理
+            name:'images/[name].[hash:8].[ext]',
           }
         }
+      },
+      {
+        test: /\.(woff|woff2|ttf|eot|svg)$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'file-loader?name=fonts/[name].[hash:8].[ext]',
+          },
+        ],
       },
     ]
   },
   plugins:[
-    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       filename: "index.html", // 最终创建的文件名
       template: path.resolve(__dirname, "../src/index.html"), // 指定模板路径
@@ -57,17 +81,15 @@ module.exports = {
       threadPool: happyThreadPool,
       verbose: true,//是否允许happypack输出日志，默认true
     }),
-   /* new Happypack({
-      id: 'css',
-      loaders: [ MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'less-loader'],
-      threadPool: happyThreadPool,
-      verbose: true,
-    }),*/
-    // css单独提取
-    /*new MiniCssExtractPlugin({   //开发环境同时使用MiniCssExtractPlugin、react-hot-loader会有冲突，导致无法自动更新修改的css
-      filename: "[name].css",
-      chunkFilename: "[id].css"
-    })*/
+    new MiniCssExtractPlugin({   //hack开发环境同时使用MiniCssExtractPlugin、HMR会有冲突，导致无法自动更新修改的css
+      filename: dev ? "[name].css" : "css/[name].[chunkhash:8].css",
+      chunkFilename: dev ? "[id].css" : "css/chunk[id]-[chunkhash].css"
+    }),
+    new webpack.DefinePlugin({  //定义全局变量
+      'process.env': {
+        NULS_ENV: JSON.stringify(process.env.NODE_ENV)
+      }
+    }),
   ],
   performance: false // 关闭性能提示
 };

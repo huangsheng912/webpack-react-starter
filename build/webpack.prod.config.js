@@ -3,19 +3,21 @@ const webpack = require("webpack");
 const merge = require('webpack-merge')
 const commonConfig = require('./webpack.base.config.js')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 // const AddAssetHtmlWebpackPlugin = require('add-asset-html-webpack-plugin')
 // const PurifyCSS = require('purifycss-webpack')
 const glob = require('glob-all')
 // const WorkboxPlugin = require('workbox-webpack-plugin') // 引入 PWA 插件
 // const CopyWebpackPlugin = require('copy-webpack-plugin')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
 
 
 module.exports = merge(commonConfig, {
   mode: 'production',
   entry: {
-    app: [path.resolve(__dirname, '..', 'src/index.js')],
+    app: [path.resolve(__dirname, '..', 'src/main.js')],
     vendor: [
       'react',
       'react-dom',
@@ -23,22 +25,16 @@ module.exports = merge(commonConfig, {
     ],
   },
   output: {
-    filename: '[name].[hash].js'
-  },
-  module: {
-    rules: [
-      {
-        test: /\.(less|css)$/,
-        exclude: /node_modules/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'less-loader'],
-      },
-    ]
+    filename: 'js/[name].[chunkhash:8].js',//定义entry文件的打包后文件名称
+    chunkFilename: 'js/chunk[id]-[chunkhash].js'  //定义非entry文件的打包后文件名称
+    // publicPath: '/_static_/', //最终访问的路径就是：localhost:8882/_static_/js/*.js
   },
   // devtool: '',
   optimization: {
-    usedExports: true,
     splitChunks: {
-      minChunks: 3,
+      //chunks: 'async',//默认只作用于异步模块，为`all`时对所有模块生效,`initial`对同步模块有效
+      minSize: 30000,  //分割前模块最小体积下限
+      minChunks: 2,   //最少被引用次数
       cacheGroups: {
         vendor: {
           chunks: 'initial',
@@ -46,15 +42,30 @@ module.exports = merge(commonConfig, {
           test: 'vendor',
           enforce: true,
         },
+        styles: {
+          name: 'styles',
+          test: /\.(less|css)$/,
+          chunks: 'all',
+          enforce: true,
+        },
+        common: {
+          chunks: "async",
+          name: "",
+          minChunks: 2,
+          minSize: 0
+        }
       },
     },
     minimizer: [
-      new UglifyJsPlugin({
-        cache: true,
-        parallel: true,
+      new UglifyJsPlugin({  //代码混淆压缩
+        cache: true,    //利用缓存
+        parallel: true, //并行处理
         uglifyOptions: {
+          warnings: true,
+          output: {
+            comments: false, //删除所有注释
+          },
           compress: {
-            // warnings: false,
             drop_debugger: true,
             drop_console: false
           }
@@ -64,6 +75,7 @@ module.exports = merge(commonConfig, {
     ]
   },
   plugins: [
+    new CleanWebpackPlugin(),
     // 清除无用 css---生产环境---csstree-shaking
     /*new PurifyCSS({
       paths: glob.sync([
@@ -73,10 +85,6 @@ module.exports = merge(commonConfig, {
         path.resolve(__dirname, '..', 'src/!**!/!*.jsx'),
       ])
     }),*/
-    new MiniCssExtractPlugin({   //开发环境同时使用MiniCssExtractPlugin、react-hot-loader会有冲突，导致无法自动更新修改的css
-      filename: "[name].css",
-      chunkFilename: "[id].css"
-    })
     // PWA配置，生产环境才需要
     /*new WorkboxPlugin.GenerateSW({
       clientsClaim: true,
@@ -88,10 +96,12 @@ module.exports = merge(commonConfig, {
     /*new AddAssetHtmlWebpackPlugin({
       filepath: path.resolve(__dirname, '../dll/jquery.dll.js') // 对应的 dll 文件路径
     }),*/
+
     /*new CopyWebpackPlugin([  //将未经过webpack处理又要用于生产环境的文件copy到打包目录下
       { from: 'src/file.txt', to: 'build/file.txt', }, // 顾名思义，from 配置来源，to 配置目标路径
       { from: 'src/!*.ico', to: 'build/!*.ico' }, // 配置项可以使用 glob
       // 可以配置很多项复制规则
-    ])*/
+    ]),*/
+    new BundleAnalyzerPlugin()
   ]
 })
