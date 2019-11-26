@@ -34,7 +34,7 @@ module.exports = {
       },
       {
         test: /\.(less|css)$/,
-        exclude: /node_modules/,
+        // exclude: /node_modules/,  //添加后引入antd样式报错
         use: [
           {
             loader:MiniCssExtractPlugin.loader,

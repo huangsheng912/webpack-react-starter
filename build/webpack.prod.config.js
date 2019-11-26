@@ -18,11 +18,6 @@ module.exports = merge(commonConfig, {
   mode: 'production',
   entry: {
     app: [path.resolve(__dirname, '..', 'src/main.js')],
-    vendor: [
-      'react',
-      'react-dom',
-      'react-router-dom',
-    ],
   },
   output: {
     filename: 'js/[name].[chunkhash:8].js',//定义entry文件的打包后文件名称
@@ -39,20 +34,20 @@ module.exports = merge(commonConfig, {
         vendor: {
           chunks: 'initial',
           name: 'vendor',
-          test: 'vendor',
-          enforce: true,
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10
         },
-        styles: {
+        /*styles: {
           name: 'styles',
           test: /\.(less|css)$/,
           chunks: 'all',
-          enforce: true,
-        },
+        },*/
         common: {
-          chunks: "async",
+          chunks: "initial",
           name: "",
           minChunks: 2,
-          minSize: 0
+          minSize: 0,
+          priority: -20
         }
       },
     },

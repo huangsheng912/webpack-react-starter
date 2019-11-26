@@ -1,5 +1,5 @@
 import React from 'react';
-import {add,release} from '@src/utils/util.js'
+import {add,release} from 'utils/util.js'
 import img1 from '../images/img1.png'
 import './index.less'
 

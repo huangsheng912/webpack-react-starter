@@ -1,5 +1,5 @@
 import React from 'react';
-import {add,release} from '@src/utils/util.js'
+import {add,release} from 'utils/util.js'
 
 import './index.less'
 
