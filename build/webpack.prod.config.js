@@ -17,25 +17,30 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 module.exports = merge(commonConfig, {
   mode: 'production',
   entry: {
-    app: [path.resolve(__dirname, '..', 'src/main.js')],
+    app: [path.resolve(__dirname, '../src/main.js')],
   },
   output: {
     filename: 'js/[name].[chunkhash:8].js',//定义entry文件的打包后文件名称
-    chunkFilename: 'js/chunk[id]-[chunkhash].js'  //定义非entry文件的打包后文件名称
+    // chunkFilename: 'js/chunk[name].[chunkhash:8].js'  //定义非entry文件的打包后文件名称
     // publicPath: '/_static_/', //最终访问的路径就是：localhost:8882/_static_/js/*.js
   },
   // devtool: '',
   optimization: {
     splitChunks: {
-      //chunks: 'async',//默认只作用于异步模块，为`all`时对所有模块生效,`initial`对同步模块有效
-      minSize: 30000,  //分割前模块最小体积下限
-      minChunks: 2,   //最少被引用次数
+      // chunks: 'all',//默认只作用于异步模块，为`all`时对所有模块生效,`initial`初始化时就能获取的模块,async 只管异步加载模块
+      minSize: 30,  //分割前模块最小体积下限
+      // minChunks: 2,   //最少被引用次数
       cacheGroups: {
-        vendor: {
-          chunks: 'initial',
+        // chunks:function(chunk){ //解决ant3全量引入svg-icon导致打包体积变大问题
+        //   // 这里的name 可以参考在使用`webpack-ant-icon-loader`时指定的`chunkName`
+        //   return chunk.name !== 'antd-icons';
+        // },
+        vendors: {
+          chunks: 'all',
           name: 'vendor',
-          test: /[\\/]node_modules[\\/]/,
-          priority: -10
+          test: /node_modules/,
+          priority: -10,
+
         },
         /*styles: {
           name: 'styles',
@@ -44,32 +49,32 @@ module.exports = merge(commonConfig, {
         },*/
         common: {
           chunks: "initial",
-          name: "",
+          name: "common",
           minChunks: 2,
-          minSize: 0,
+          minSize: 30,
           priority: -20
         }
       },
     },
     minimizer: [
-      new UglifyJsPlugin({  //代码混淆压缩
-        cache: true,    //利用缓存
-        parallel: true, //并行处理
-        uglifyOptions: {
-          warnings: true,
-          output: {
-            comments: false, //删除所有注释
-          },
-          compress: {
-            drop_debugger: true,
-            drop_console: false
-          }
-        }
-      }),
-      new OptimizeCSSAssetsPlugin({})
+      // new UglifyJsPlugin({  //代码混淆压缩
+      //   cache: true,    //利用缓存
+      //   parallel: true, //并行处理
+      //   uglifyOptions: {
+      //     output: {
+      //       comments: false, //删除所有注释
+      //     },
+      //     compress: {
+      //       drop_debugger: true,
+      //       drop_console: true
+      //     }
+      //   }
+      // }),
+      // new OptimizeCSSAssetsPlugin({})
     ]
   },
   plugins: [
+    new BundleAnalyzerPlugin(),
     new CleanWebpackPlugin(),
     // 清除无用 css---生产环境---csstree-shaking
     /*new PurifyCSS({
@@ -97,6 +102,5 @@ module.exports = merge(commonConfig, {
       { from: 'src/!*.ico', to: 'build/!*.ico' }, // 配置项可以使用 glob
       // 可以配置很多项复制规则
     ]),*/
-    new BundleAnalyzerPlugin()
   ]
 })

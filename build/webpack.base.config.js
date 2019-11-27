@@ -24,8 +24,18 @@ module.exports = {
   module: {
     rules: [
       {
+        loader:'webpack-ant-icon-loader',
+        enforce: 'pre',
+        // options:{
+        //   chunkName:'antd-icons'
+        // },
+        include:[
+          require.resolve('@ant-design/icons/lib/dist')
+        ]
+      },
+      {
         test: /\.(js|jsx)$/,
-        exclude: /node_modules/,
+        // exclude: /node_modules/,
         use: [
           {
             loader: "happypack/loader?id=js"  //@babel/preset-env （转译 ES6 ~ ES9 的语法）、 @babel/preset-react （转译React )。
@@ -34,7 +44,7 @@ module.exports = {
       },
       {
         test: /\.(less|css)$/,
-        // exclude: /node_modules/,  //添加后引入antd样式报错
+        // exclude: /node_modules/,  //添加后引入三方库样式报错
         use: [
           {
             loader:MiniCssExtractPlugin.loader,
@@ -43,7 +53,7 @@ module.exports = {
               reloadAll: true,
             }
           },
-          'css-loader', 'postcss-loader', 'less-loader'],
+          'css-loader', 'postcss-loader', 'less-loader?javascriptEnabled=true'],
       },
       {
         test: /\.(png|jpg|jpeg|gif|svg)$/,
@@ -83,7 +93,7 @@ module.exports = {
     }),
     new MiniCssExtractPlugin({   //hack开发环境同时使用MiniCssExtractPlugin、HMR会有冲突，导致无法自动更新修改的css
       filename: dev ? "[name].css" : "css/[name].[chunkhash:8].css",
-      chunkFilename: dev ? "[id].css" : "css/chunk[id]-[chunkhash].css"
+      chunkFilename: dev ? "[id].css" : "css/chunk[name]-[chunkhash:8].css"
     }),
     new webpack.DefinePlugin({  //定义全局变量
       'process.env': {

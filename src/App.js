@@ -3,7 +3,6 @@ import Router from "./router/index.js";
 import './style'
 import { BrowserRouter} from "react-router-dom";
 import { hot } from "react-hot-loader";
-import 'antd/dist/antd.css';
 
 const App = ()=> {
   return (

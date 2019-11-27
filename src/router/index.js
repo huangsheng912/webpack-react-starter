@@ -13,6 +13,7 @@ const Router = () => (
     <header>
       <Link to="/">PageA</Link>
       <Link to="/b">PageB</Link>
+      <Link to="/c">PageC</Link>
     </header>
     <main>
       <Switch>
