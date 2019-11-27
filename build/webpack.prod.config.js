@@ -31,11 +31,11 @@ module.exports = merge(commonConfig, {
       minSize: 30,  //分割前模块最小体积下限
       // minChunks: 2,   //最少被引用次数
       cacheGroups: {
-        // chunks:function(chunk){ //解决ant3全量引入svg-icon导致打包体积变大问题
-        //   // 这里的name 可以参考在使用`webpack-ant-icon-loader`时指定的`chunkName`
-        //   return chunk.name !== 'antd-icons';
-        // },
         vendors: {
+          // chunks:function(chunk){ //解决ant3全量引入svg-icon导致打包体积变大问题
+          //   // 这里的name 可以参考在使用`webpack-ant-icon-loader`时指定的`chunkName`
+          //   return chunk.name !== 'antd-icons';
+          // },
           chunks: 'all',
           name: 'vendor',
           test: /node_modules/,
