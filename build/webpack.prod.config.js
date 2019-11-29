@@ -11,6 +11,7 @@ const glob = require('glob-all')
 // const WorkboxPlugin = require('workbox-webpack-plugin') // 引入 PWA 插件
 // const CopyWebpackPlugin = require('copy-webpack-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const CompressionPlugin = require("compression-webpack-plugin")
 
 
 
@@ -57,25 +58,30 @@ module.exports = merge(commonConfig, {
       },
     },
     minimizer: [
-      // new UglifyJsPlugin({  //代码混淆压缩
-      //   cache: true,    //利用缓存
-      //   parallel: true, //并行处理
-      //   uglifyOptions: {
-      //     output: {
-      //       comments: false, //删除所有注释
-      //     },
-      //     compress: {
-      //       drop_debugger: true,
-      //       drop_console: true
-      //     }
-      //   }
-      // }),
-      // new OptimizeCSSAssetsPlugin({})
+      new UglifyJsPlugin({  //代码混淆压缩
+        cache: true,    //利用缓存
+        parallel: true, //并行处理
+        uglifyOptions: {
+          output: {
+            comments: false, //删除所有注释
+          },
+          compress: {
+            drop_debugger: true,
+            drop_console: true
+          }
+        }
+      }),
+      new OptimizeCSSAssetsPlugin({})
     ]
   },
   plugins: [
     new BundleAnalyzerPlugin(),
     new CleanWebpackPlugin(),
+    new CompressionPlugin({
+      algorithm:  'gzip',
+      test:  /\.js$|\.css$/,
+      threshold: 10240,
+    })
     // 清除无用 css---生产环境---csstree-shaking
     /*new PurifyCSS({
       paths: glob.sync([

@@ -1,5 +1,6 @@
 const path = require("path");
-const merge = require('webpack-merge')
+const merge = require('webpack-merge');
+const webpack = require('webpack')
 const commonConfig = require('./webpack.base.config.js')
 
 module.exports = merge(commonConfig, {
@@ -30,12 +31,13 @@ module.exports = merge(commonConfig, {
       // 代理到后端的服务地址
       "/api": {
         target: "http://localhost:8888",
-        pathRewrite :{'^/api': ''}
+        pathRewrite :{'^/api': ''},
+        changeOrigin: true,  // 是否跨域
       }
     }
   },
   plugins: [
     //开启HMR(热替换功能,替换更新部分,不重载页面！) devServer中设置hot后该插件自动开启
-    // new webpack.HotModuleReplacementPlugin(),
+    new webpack.HotModuleReplacementPlugin(),
   ],
 });
