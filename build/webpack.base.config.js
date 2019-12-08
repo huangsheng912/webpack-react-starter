@@ -1,6 +1,5 @@
 const path = require("path");
 const webpack = require("webpack");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const Happypack = require('happypack');
@@ -12,6 +11,7 @@ module.exports = {
   entry: {},
   output: {
     path: path.resolve(__dirname,'../dist'),
+    publicPath:'/'  //静态页面文件调用的路径
   },
   resolve: {
     extensions: ['.jsx', '.js', '.less', '.css', 'json'],//设置引入文件可省略的拓展名
@@ -32,7 +32,7 @@ module.exports = {
       // },
       {
         test: /\.(js|jsx)$/,
-        // exclude: /node_modules/,
+        exclude: /node_modules/,
         use: [
           {
             loader: "happypack/loader?id=js"  //@babel/preset-env （转译 ES6 ~ ES9 的语法）、 @babel/preset-react （转译React )。
@@ -78,6 +78,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: "index.html", // 最终创建的文件名
       template: path.resolve(__dirname, "../src/index.html"), // 指定模板路径
+      // favicon: path.resolve(__dirname,'../src/images/favicon.ico') //favicon.ico文件路径
     }),
     new Happypack({
       //用id来标识 happypack处理那里类文件
@@ -90,7 +91,8 @@ module.exports = {
     }),
     new MiniCssExtractPlugin({   //hack开发环境同时使用MiniCssExtractPlugin、HMR会有冲突，导致无法自动更新修改的css
       filename: dev ? "[name].css" : "css/[name].[chunkhash:8].css",
-      chunkFilename: dev ? "[id].css" : "css/chunk[name]-[chunkhash:8].css"
+      chunkFilename: dev ? "[id].css" : "css/chunk[name]-[chunkhash:8].css",
+      ignoreOrder: true, //忽略引入顺序造成的警告
     }),
     new webpack.DefinePlugin({  //定义全局变量
       'process.env': {

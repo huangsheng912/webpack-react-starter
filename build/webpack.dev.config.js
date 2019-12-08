@@ -13,7 +13,7 @@ module.exports = merge(commonConfig, {
   },
   output: {
     filename:"[name].js",
-    chunkFilename: '[name].js'
+    // chunkFilename: '[name].js'
   },
   devServer: {
     hot: true,
@@ -30,12 +30,13 @@ module.exports = merge(commonConfig, {
       // 代理到后端的服务地址
       "/api": {
         target: "http://localhost:8888",
+        changeOrigin: true,  //是否跨域
         pathRewrite :{'^/api': ''}
       }
     }
   },
   plugins: [
     //开启HMR(热替换功能,替换更新部分,不重载页面！) devServer中设置hot后该插件自动开启
-    // new webpack.HotModuleReplacementPlugin(),
+    new webpack.HotModuleReplacementPlugin(),
   ],
 });

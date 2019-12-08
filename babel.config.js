@@ -1,6 +1,5 @@
 
 
-//.babel文件是用来dynamic插件但是无效，babel.config.js可以
 module.exports = {
   "presets": [
     [
@@ -13,6 +12,7 @@ module.exports = {
     "@babel/preset-react"
   ],
   "plugins": [
+    "react-hot-loader/babel",
     "@babel/plugin-transform-runtime",
     "@babel/plugin-syntax-dynamic-import",
     ["@babel/plugin-proposal-decorators", { "legacy": true }],
@@ -20,5 +20,6 @@ module.exports = {
     ["import", { "libraryName": "antd", "libraryDirectory": "es", "style": true }]
   ],
   "ignore": [/[\/\\]core-js/, /@babel[\/\\]runtime/],//防止babel babeling它自己
-  "sourceType": 'unambiguous'//防止babel弄乱导出
+  "sourceType": 'unambiguous'//防
+  // 止babel弄乱导出
 }

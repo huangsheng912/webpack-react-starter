@@ -11,6 +11,7 @@ const glob = require('glob-all')
 // const WorkboxPlugin = require('workbox-webpack-plugin') // 引入 PWA 插件
 // const CopyWebpackPlugin = require('copy-webpack-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const CompressionPlugin = require("compression-webpack-plugin")
 
 
 
@@ -28,7 +29,7 @@ module.exports = merge(commonConfig, {
   optimization: {
     splitChunks: {
       // chunks: 'all',//默认只作用于异步模块，为`all`时对所有模块生效,`initial`初始化时就能获取的模块,async 只管异步加载模块
-      minSize: 30,  //分割前模块最小体积下限
+      minSize: 30000,  //分割前模块最小体积下限
       // minChunks: 2,   //最少被引用次数
       cacheGroups: {
         vendors: {
@@ -57,25 +58,31 @@ module.exports = merge(commonConfig, {
       },
     },
     minimizer: [
-      // new UglifyJsPlugin({  //代码混淆压缩
-      //   cache: true,    //利用缓存
-      //   parallel: true, //并行处理
-      //   uglifyOptions: {
-      //     output: {
-      //       comments: false, //删除所有注释
-      //     },
-      //     compress: {
-      //       drop_debugger: true,
-      //       drop_console: true
-      //     }
-      //   }
-      // }),
-      // new OptimizeCSSAssetsPlugin({})
+      new UglifyJsPlugin({  //代码混淆压缩
+        cache: true,    //利用缓存
+        parallel: true, //并行处理
+        uglifyOptions: {
+          output: {
+            comments: false, //删除所有注释
+          },
+          compress: {
+            drop_debugger: true,
+            drop_console: true
+          }
+        }
+      }),
+      new OptimizeCSSAssetsPlugin({})
     ]
   },
   plugins: [
     new BundleAnalyzerPlugin(),
     new CleanWebpackPlugin(),
+    //开启gzip
+    new CompressionPlugin({
+      algorithm:  'gzip',
+      test:  /\.js$|\.css$/,
+      threshold: 10240,
+    })
     // 清除无用 css---生产环境---csstree-shaking
     /*new PurifyCSS({
       paths: glob.sync([
