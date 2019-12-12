@@ -11,7 +11,7 @@ module.exports = {
   entry: {},
   output: {
     path: path.resolve(__dirname,'../dist'),
-    publicPath:'/'  //静态页面文件调用的路径
+    publicPath:'/'  //静态页面文件调用的路径，/asset/=> localhost:8080/asset/home
   },
   resolve: {
     extensions: ['.jsx', '.js', '.less', '.css', 'json'],//设置引入文件可省略的拓展名
