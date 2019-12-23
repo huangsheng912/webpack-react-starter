@@ -1,0 +1,59 @@
+.transfer-out {
+  .transfer-operate {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    >div {
+      flex:1;
+      max-width: 900px;
+      border: 1px solid #c9c9c9;
+      padding: 30px 100px;
+      .name{
+        color:#333;
+        line-height: 24px;
+        button {
+          line-height: 1;
+        }
+      }
+      .payment-address {
+        &>p {
+          margin-bottom: 10px;
+        }
+        .address-info {
+          display: flex;
+          padding: 20px;
+          border: 1px solid #c9c9c9;
+          .address-type {
+            flex:2;
+          }
+          .address{
+            flex:6
+          }
+          .tag{
+            flex:3
+          }
+        }
+      }
+      .tc button {
+        padding: 0 45px;
+      }
+    }
+  }
+  .transfer-list {
+    margin-top: 30px;
+    border-top: 1px solid #c9c9c9;
+    .ant-select {
+      width: 120px;
+      margin: 20px 0 ;
+    }
+  }
+}
+.address-modal {
+  .ant-modal-title {
+    font-size: 20px;
+    text-align: center;
+  }
+  tbody {
+    cursor: pointer;
+  }
+}

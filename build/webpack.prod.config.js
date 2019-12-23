@@ -25,7 +25,7 @@ module.exports = merge(commonConfig, {
     // chunkFilename: 'js/chunk[name].[chunkhash:8].js'  //定义非entry文件的打包后文件名称
     // publicPath: '/_static_/', //最终访问的路径就是：localhost:8882/_static_/js/*.js
   },
-  // devtool: '',
+  devtool: false,
   optimization: {
     splitChunks: {
       // chunks: 'all',//默认只作用于异步模块，为`all`时对所有模块生效,`initial`初始化时就能获取的模块,async 只管异步加载模块
@@ -49,7 +49,7 @@ module.exports = merge(commonConfig, {
           chunks: 'all',
         },*/
         common: {
-          chunks: "initial",
+          chunks: "all",
           name: "common",
           minChunks: 2,
           minSize: 30,
@@ -75,13 +75,13 @@ module.exports = merge(commonConfig, {
     ]
   },
   plugins: [
-    new BundleAnalyzerPlugin(),
+    // new BundleAnalyzerPlugin(),
     new CleanWebpackPlugin(),
     //开启gzip
     new CompressionPlugin({
       algorithm:  'gzip',
       test:  /\.js$|\.css$/,
-      threshold: 10240,
+      threshold: 30000,
     })
     // 清除无用 css---生产环境---csstree-shaking
     /*new PurifyCSS({
@@ -96,12 +96,6 @@ module.exports = merge(commonConfig, {
     /*new WorkboxPlugin.GenerateSW({
       clientsClaim: true,
       skipWaiting: true
-    }),*/
-    /*new webpack.DllReferencePlugin({
-      manifest: path.resolve(__dirname, '..', 'dll/jquery-manifest.json')
-    })*/
-    /*new AddAssetHtmlWebpackPlugin({
-      filepath: path.resolve(__dirname, '../dll/jquery.dll.js') // 对应的 dll 文件路径
     }),*/
 
     /*new CopyWebpackPlugin([  //将未经过webpack处理又要用于生产环境的文件copy到打包目录下

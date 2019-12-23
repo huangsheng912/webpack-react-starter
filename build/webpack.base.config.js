@@ -6,6 +6,7 @@ const Happypack = require('happypack');
 const os = require('os');
 const happyThreadPool = Happypack.ThreadPool({size:os.cpus().length});
 const dev = process.env.NODE_ENV === 'development';
+const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin');
 
 module.exports = {
   entry: {},
@@ -17,7 +18,9 @@ module.exports = {
     extensions: ['.jsx', '.js', '.less', '.css', 'json'],//设置引入文件可省略的拓展名
     alias: {
       "src": path.resolve(__dirname,'../src'),  //设置引入路径别名
+      "page": path.resolve(__dirname,'../src/pages'),
       "utils": path.resolve(__dirname,'../src/utils'),
+      "components": path.resolve(__dirname,'../src/components')
     },
     modules: ['node_modules'], //webpack解析模块时应该搜索的目录
   },
@@ -30,6 +33,15 @@ module.exports = {
       //     require.resolve('@ant-design/icons/lib/dist')
       //   ]
       // },
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        loader: "eslint-loader",
+        enforce: "pre",
+        options: {
+          fix: true, //每次保存是自动修复
+        }
+      },
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
@@ -99,6 +111,7 @@ module.exports = {
         NULS_ENV: JSON.stringify(process.env.NODE_ENV)
       }
     }),
+    new AntdDayjsWebpackPlugin(),//使用day.js代替moment，减少打包体积
   ],
   performance: false // 关闭性能提示
 };
