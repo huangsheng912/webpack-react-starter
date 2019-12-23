@@ -85,5 +85,17 @@
     "last 5 version",
     ">1%",
     "ie >=8"
-  ]
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{jsx,txs,ts,js,json,less,css,md}": [
+      "prettier --write",
+      "eslint --fix",
+      "git add"
+    ]
+  }
 }
