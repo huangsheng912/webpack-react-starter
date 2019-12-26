@@ -1,35 +1,34 @@
 const path = require("path");
 const webpack = require("webpack");
-const merge = require('webpack-merge')
-const commonConfig = require('./webpack.base.config.js')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const merge = require("webpack-merge");
+const commonConfig = require("./webpack.base.config.js");
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 // const AddAssetHtmlWebpackPlugin = require('add-asset-html-webpack-plugin')
 // const PurifyCSS = require('purifycss-webpack')
-const glob = require('glob-all')
+const glob = require("glob-all");
 // const WorkboxPlugin = require('workbox-webpack-plugin') // 引入 PWA 插件
 // const CopyWebpackPlugin = require('copy-webpack-plugin')
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const CompressionPlugin = require("compression-webpack-plugin")
-
-
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
+  .BundleAnalyzerPlugin;
+const CompressionPlugin = require("compression-webpack-plugin");
 
 module.exports = merge(commonConfig, {
-  mode: 'production',
+  mode: "production",
   entry: {
-    app: [path.resolve(__dirname, '../src/main.js')],
+    app: [path.resolve(__dirname, "../src/main.js")]
   },
   output: {
-    filename: 'js/[name].[chunkhash:8].js',//定义entry文件的打包后文件名称
+    filename: "js/[name].[chunkhash:8].js" //定义entry文件的打包后文件名称
     // chunkFilename: 'js/chunk[name].[chunkhash:8].js'  //定义非entry文件的打包后文件名称
     // publicPath: '/_static_/', //最终访问的路径就是：localhost:8882/_static_/js/*.js
   },
   devtool: false,
   optimization: {
     splitChunks: {
-      // chunks: 'all',//默认只作用于异步模块，为`all`时对所有模块生效,`initial`初始化时就能获取的模块,async 只管异步加载模块
-      minSize: 30000,  //分割前模块最小体积下限
+      chunks: "all", //默认只作用于异步模块，为`all`时对所有模块生效,`initial`初始化时就能获取的模块,async 只管异步加载模块
+      minSize: 30000, //分割前模块最小体积下限
       // minChunks: 2,   //最少被引用次数
       cacheGroups: {
         vendors: {
@@ -37,11 +36,15 @@ module.exports = merge(commonConfig, {
           //   // 这里的name 可以参考在使用`webpack-ant-icon-loader`时指定的`chunkName`
           //   return chunk.name !== 'antd-icons';
           // },
-          chunks: 'all',
-          name: 'vendor',
+          //chunks: "initial", //只打包初始时依赖的第三方
+          name: "vendor",
           test: /node_modules/,
-          priority: -10,
-
+          priority: 10
+        },
+        antd: {
+          name: "antd",
+          test: module => /antd/.test(module.context),
+          priority: 20
         },
         /*styles: {
           name: 'styles',
@@ -52,18 +55,19 @@ module.exports = merge(commonConfig, {
           chunks: "all",
           name: "common",
           minChunks: 2,
-          minSize: 30,
-          priority: -20
+          // minSize: 30,
+          priority: 5
         }
-      },
+      }
     },
     minimizer: [
-      new UglifyJsPlugin({  //代码混淆压缩
-        cache: true,    //利用缓存
+      new UglifyJsPlugin({
+        //代码混淆压缩
+        cache: true, //利用缓存
         parallel: true, //并行处理
         uglifyOptions: {
           output: {
-            comments: false, //删除所有注释
+            comments: false //删除所有注释
           },
           compress: {
             drop_debugger: true,
@@ -75,13 +79,13 @@ module.exports = merge(commonConfig, {
     ]
   },
   plugins: [
-    // new BundleAnalyzerPlugin(),
+    new BundleAnalyzerPlugin(),
     new CleanWebpackPlugin(),
     //开启gzip
     new CompressionPlugin({
-      algorithm:  'gzip',
-      test:  /\.js$|\.css$/,
-      threshold: 30000,
+      algorithm: "gzip",
+      test: /\.js$|\.css$/,
+      threshold: 30000
     })
     // 清除无用 css---生产环境---csstree-shaking
     /*new PurifyCSS({
@@ -104,4 +108,4 @@ module.exports = merge(commonConfig, {
       // 可以配置很多项复制规则
     ]),*/
   ]
-})
+});
