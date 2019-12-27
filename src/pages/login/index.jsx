@@ -3,6 +3,7 @@ import "./index.less";
 import { Form, Input, Button, Icon, Modal, message } from "antd";
 import { post } from "utils/request";
 import { observer, inject } from "mobx-react";
+import routeConfig from "src/router/config";
 
 const formItemLayout = {
   labelCol: { span: 8 },
@@ -24,6 +25,17 @@ class Login extends Component {
             message.error("获取菜单失败");
             return;
           }
+          /* const newMenu = [];
+          res.data.menus.map(v=>{
+            routeConfig.map(route=>{
+              if (v.title === route.title) {
+                v.icon = route.icon;
+                if (route.selectKey) {
+                  v.selectKey = route.selectKey;
+                }
+              }
+            })
+          });*/
           const configInfo = {
             menuConfig: res.data.menus,
             userName: res.data.userName,

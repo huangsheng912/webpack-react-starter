@@ -14,14 +14,15 @@ class Main extends React.Component {
   state = {
     loading: true,
     hash: "",
-    transferLoading: false
+    transferLoading: false,
+    page: 0
   };
   componentDidMount() {
     this.getList();
   }
   async getList() {
     const params = {
-      page: this.state.page || 0,
+      page: this.state.page,
       size: 10
     };
     const res = await get("/api/coldWalletRecord", params);
@@ -106,7 +107,15 @@ class Main extends React.Component {
     }
   };
   render() {
-    const { total, tableList, loading, hash, toAddress, amount } = this.state;
+    const {
+      total,
+      tableList,
+      loading,
+      hash,
+      toAddress,
+      amount,
+      page
+    } = this.state;
     const columns = [
       {
         title: "业务",
@@ -189,6 +198,7 @@ class Main extends React.Component {
             loading={loading}
             total={total}
             changeSize={this.changeSize}
+            currentPage={page}
           />
         </div>
         {/*<BroadcastModal ref={v=>this.broadcastModal = v}/>*/}

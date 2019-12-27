@@ -12,7 +12,8 @@ const { Option } = Select;
 const configInfo = JSON.parse(localStorage.getItem("configInfo")) || {};
 class Main extends React.Component {
   state = {
-    loading: true
+    loading: true,
+    page: 0
   };
   componentDidMount() {
     this.getList();
@@ -20,7 +21,7 @@ class Main extends React.Component {
   }
   async getList() {
     const params = {
-      page: this.state.page || 0,
+      page: this.state.page,
       size: 10,
       type: this.state.type || "All"
     };
@@ -74,7 +75,8 @@ class Main extends React.Component {
       tableList,
       addressList,
       addressInfo = {},
-      loading
+      loading,
+      page
     } = this.state;
     const transferType = [
       { label: "全部", value: "All" },
@@ -196,6 +198,7 @@ class Main extends React.Component {
             loading={loading}
             total={total}
             changeSize={this.changeSize}
+            currentPage={page}
           />
         </div>
         <AddressModal

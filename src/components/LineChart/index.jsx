@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { Component, PureComponent } from "react";
 import PropTypes from "prop-types";
 import { Spin } from "antd";
 import { throttle } from "utils/util";
@@ -29,7 +29,7 @@ class LineChart extends PureComponent {
   resize = () => {
     this.chart && this.chart.resize();
   };
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps) {
     const isEqual =
       JSON.stringify(this.props.data) === JSON.stringify(nextProps.data);
     if (!isEqual) {
@@ -62,7 +62,7 @@ class LineChart extends PureComponent {
         data: [],
         smooth: true
       });
-      props.data.map(v => {
+      props.data.map((v, i) => {
         if (index === 0) {
           xAxisData.push(v[item]);
         } else {

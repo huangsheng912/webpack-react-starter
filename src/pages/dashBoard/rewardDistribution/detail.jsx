@@ -11,12 +11,35 @@ const { Option } = Select;
 const configInfo = JSON.parse(localStorage.getItem("configInfo")) || {};
 class Main extends React.Component {
   state = {
-    tableLoading: true
+    tableLoading: true,
+    page: 0
   };
   componentDidMount() {
+    console.log(this.props.location, "--ppp");
     this.getTotal();
     this.getList();
   }
+  UNSAFE_componentWillReceiveProps(nextProps, nextContext) {
+    let newId = nextProps.location.search;
+    const oldId = this.props.location.search;
+    if (newId && newId !== oldId) {
+      this.setState(
+        {
+          tableLoading: true,
+          page: 0,
+          coinType: "All",
+          status: "All",
+          minAmount: "",
+          maxAmount: ""
+        },
+        () => {
+          this.getTotal();
+          this.getList();
+        }
+      );
+    }
+  }
+
   async getTotal() {
     const res = await get("/usdi/dashboard/distribution/total");
     if (res.success) {
@@ -32,7 +55,7 @@ class Main extends React.Component {
   }
   async getList() {
     const params = {
-      page: this.state.page || 0,
+      page: this.state.page,
       size: 10,
       coinType: this.state.coinType || "All",
       status: this.state.status || "All",
@@ -97,7 +120,8 @@ class Main extends React.Component {
       total,
       minAmount,
       maxAmount,
-      tableLoading
+      tableLoading,
+      page
     } = this.state;
     const coinType = [
       { label: "全部", value: "All" },
@@ -223,6 +247,7 @@ class Main extends React.Component {
             loading={tableLoading}
             total={total}
             changeSize={this.changeSize}
+            currentPage={page}
           />
         </div>
       </div>

@@ -18,7 +18,6 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   response => {
     if (response.data.code === -100) {
-      //返回的状态码标识未登录
       message.warning("请重新登录");
       window.location.href = "/login";
       return Promise.reject(response);
@@ -54,6 +53,7 @@ axios.interceptors.response.use(
 );
 
 export function get(url, params = {}) {
+  // console.log(params,'params')
   return new Promise((resolve, reject) => {
     axios
       .get(url, { params })
@@ -87,7 +87,28 @@ export function put(url, params = {}) {
         resolve(res.data);
       })
       .catch(e => {
+        console.log(e, "---ee");
         reject(e.data);
       });
+  });
+}
+
+export function rPost(url, methodName, data = []) {
+  return new Promise((resolve, reject) => {
+    data.unshift(config.API_CHAIN_ID);
+    const params = {
+      jsonrpc: "2.0",
+      method: methodName,
+      params: data,
+      id: Math.floor(Math.random() * 1000)
+    };
+    axios.post(config.API_URL + url, params).then(
+      response => {
+        resolve(response.data);
+      },
+      err => {
+        reject(err);
+      }
+    );
   });
 }

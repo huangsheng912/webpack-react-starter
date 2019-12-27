@@ -19,7 +19,8 @@ const { RangePicker } = DatePicker;
 
 class Main extends React.Component {
   state = {
-    loading: true
+    loading: true,
+    page: 0
   };
   componentDidMount() {
     this.getList();
@@ -29,7 +30,7 @@ class Main extends React.Component {
       loading: true
     });
     const params = {
-      page: this.state.page || 0,
+      page: this.state.page,
       size: 10,
       status: this.state.status,
       minTime: this.state.minTime,
@@ -60,7 +61,13 @@ class Main extends React.Component {
   };
   //查询
   doSearch = () => {
-    this.getList;
+    this.setState(
+      {
+        loading: true,
+        page: 0
+      },
+      this.getList
+    );
     console.log(this.state, "---state");
   };
   //表格翻页
@@ -132,7 +139,14 @@ class Main extends React.Component {
     }
   };
   render() {
-    const { searchVal, tableList, total, loading, modalTitle } = this.state;
+    const {
+      searchVal,
+      tableList,
+      total,
+      loading,
+      modalTitle,
+      page
+    } = this.state;
     const statusType = [
       { label: "全部", value: "All" },
       { label: "启用", value: "y" },
@@ -238,6 +252,7 @@ class Main extends React.Component {
           loading={loading}
           total={total}
           changeSize={this.changeSize}
+          currentPage={page}
         />
         <EditModal
           wrappedComponentRef={v => (this.editModal = v)}

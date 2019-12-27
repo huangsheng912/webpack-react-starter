@@ -54,7 +54,8 @@ const config = [
         title: "奖励发放明细",
         value: "/dashBoard/rewardDistribution/detail",
         component: RewardDistributionDetail,
-        hide: true
+        detail: true,
+        parent: "/dashBoard/rewardDistribution"
       }
     ]
   },

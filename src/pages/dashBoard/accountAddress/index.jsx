@@ -8,7 +8,8 @@ import { transformNum } from "../../../utils/util";
 const configInfo = JSON.parse(localStorage.getItem("configInfo")) || {};
 class Main extends React.Component {
   state = {
-    tableLoading: true
+    tableLoading: true,
+    page: 0
   };
   componentDidMount() {
     this.getTotal();
@@ -26,7 +27,7 @@ class Main extends React.Component {
   }
   async getList() {
     const params = {
-      page: this.state.page || 0,
+      page: this.state.page,
       size: 10,
       minBalance: this.state.minBalance,
       maxBalance: this.state.maxBalance,
@@ -95,7 +96,8 @@ class Main extends React.Component {
       minIncome,
       maxIncome,
       address,
-      tableLoading
+      tableLoading,
+      page
     } = this.state;
     const columns = [
       {
@@ -184,6 +186,7 @@ class Main extends React.Component {
             total={total}
             loading={tableLoading}
             changeSize={this.changeSize}
+            currentPage={page}
           />
         </div>
       </div>

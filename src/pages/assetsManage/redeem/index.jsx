@@ -13,7 +13,8 @@ const configInfo = JSON.parse(localStorage.getItem("configInfo")) || {};
 class Main extends React.Component {
   state = {
     loading: true,
-    orderState: "All"
+    orderState: "All",
+    page: 0
   };
   componentDidMount() {
     this.getList();
@@ -22,7 +23,7 @@ class Main extends React.Component {
   async getList() {
     // console.log(this.state.orderState)
     const params = {
-      page: this.state.page || 0,
+      page: this.state.page,
       size: 10
     };
     const url =
@@ -88,7 +89,7 @@ class Main extends React.Component {
     );
   };
   render() {
-    const { total, tableList, loading } = this.state;
+    const { total, tableList, loading, page } = this.state;
     const orderStateType = [
       { label: "全部", value: "All" },
       { label: "处理中", value: "Process" },
@@ -184,6 +185,7 @@ class Main extends React.Component {
             loading={loading}
             total={total}
             changeSize={this.changeSize}
+            currentPage={page}
           />
         </div>
       </div>

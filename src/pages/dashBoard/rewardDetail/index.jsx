@@ -11,7 +11,8 @@ const { Option } = Select;
 const configInfo = JSON.parse(localStorage.getItem("configInfo")) || {};
 class Main extends React.Component {
   state = {
-    tableLoading: true
+    tableLoading: true,
+    page: 0
   };
   componentDidMount() {
     this.getTotal();
@@ -32,7 +33,7 @@ class Main extends React.Component {
   }
   async getList() {
     const params = {
-      page: this.state.page || 0,
+      page: this.state.page,
       size: 10,
       type: this.state.type || "All"
     };
@@ -83,7 +84,15 @@ class Main extends React.Component {
     );
   };
   render() {
-    const { usdi, nuls, address, list = [], total, tableLoading } = this.state;
+    const {
+      usdi,
+      nuls,
+      address,
+      list = [],
+      total,
+      tableLoading,
+      page
+    } = this.state;
     const businessType = [
       { label: "全部", value: "All" },
       { label: "USDI收益", value: "USDI" },
@@ -165,6 +174,7 @@ class Main extends React.Component {
             loading={tableLoading}
             total={total}
             changeSize={this.changeSize}
+            currentPage={page}
           />
         </div>
       </div>

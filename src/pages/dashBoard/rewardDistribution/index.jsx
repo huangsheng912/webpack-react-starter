@@ -5,23 +5,36 @@ import { Button, DatePicker } from "antd";
 import moment from "moment";
 import Table from "components/Table";
 import { transformNum } from "../../../utils/util";
+import { observer, inject } from "mobx-react";
 
 const { RangePicker } = DatePicker;
 const configInfo = JSON.parse(localStorage.getItem("configInfo")) || {};
+
+@inject("configStore")
+@observer
 class Main extends React.Component {
   state = {
-    tableLoading: true
+    tableLoading: true,
+    page: 0
   };
+
   componentDidMount() {
     this.getTotal();
     this.getList();
   }
+
   async getTotal() {
     const res = await get("/api/earnings/total");
     if (res.success) {
       const r = res.data;
-      r.nuls = transformNum({ n: r.nuls, d: configInfo.nulsDecimals });
-      r.usdi = transformNum({ n: r.usdi, d: configInfo.usdiDecimals });
+      r.nuls = transformNum({
+        n: r.nuls,
+        d: configInfo.nulsDecimals
+      });
+      r.usdi = transformNum({
+        n: r.usdi,
+        d: configInfo.usdiDecimals
+      });
       this.setState({
         loading: true,
         nuls: r.nuls,
@@ -29,9 +42,10 @@ class Main extends React.Component {
       });
     }
   }
+
   async getList() {
     const params = {
-      page: this.state.page || 0,
+      page: this.state.page,
       size: 10,
       start: this.state.start,
       end: this.state.end
@@ -63,6 +77,7 @@ class Main extends React.Component {
       });
     }
   }
+
   onTimeChange = (value, dateString) => {
     console.log(value[0].$d.getTime(), "time");
     console.log("Selected Time: ", value);
@@ -95,8 +110,21 @@ class Main extends React.Component {
       this.getList
     );
   };
+  toDetail = id => {
+    this.props.configStore.changeRoute(
+      "/dashBoard/rewardDistribution/detail?id=" + id
+    );
+    this.props.history.push({
+      pathname: "/dashBoard/rewardDistribution/detail",
+      query: {
+        id: 456
+      },
+      search: "?ID=" + id
+    });
+  };
+
   render() {
-    const { usdi, nuls, list = [], total, tableLoading } = this.state;
+    const { usdi, nuls, list = [], total, tableLoading, page } = this.state;
     const columns = [
       {
         key: "date",
@@ -129,12 +157,12 @@ class Main extends React.Component {
         dataIndex: "settlementCount",
         title: "发放地址数"
       }
-      // {
-      //   key:'operate',
-      //   dataIndex: 'operate',
-      //   title: '操作',
-      //   render: ()=> <a onClick={()=>this.props.history.push('/dashBoard/rewardDistribution/detail')} >查看明细</a>
-      // },
+      /*{
+        key: 'operate',
+        dataIndex: 'operate',
+        title: '操作',
+        render: (text, record) => <a onClick={() => this.toDetail(record.date)}>查看明细</a>
+      },*/
     ];
     return (
       <div className="redemption-page">
@@ -165,6 +193,7 @@ class Main extends React.Component {
             loading={tableLoading}
             total={total}
             changeSize={this.changeSize}
+            currentPage={page}
           />
         </div>
       </div>

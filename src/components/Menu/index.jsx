@@ -6,6 +6,7 @@ import { Redirect, Route, Switch } from "react-router-dom";
 import { get } from "utils/request";
 import AsyncComponent from "page/AsyncComponent";
 import { observer, inject } from "mobx-react";
+import { toJS } from "mobx";
 // import loadable from '@loadable/component'
 import {
   Layout,
@@ -34,7 +35,7 @@ class PasswordModal extends React.Component {
   };
   visible = () => {
     this.setState(state => ({
-      show: !state.show
+      show: !this.state.show
     }));
   };
   handleOk = async () => {
@@ -125,12 +126,14 @@ class PasswordModal extends React.Component {
   }
 }
 
-// eslint-disable-next-line react/no-multi-comp
 class RenderRoute extends React.Component {
   //避免menu组件setState导致异步组件多次重复加载
   shouldComponentUpdate(nextProps, nextState, nextContext) {
     // console.log(nextProps,1,nextState,2,nextContext,3,this.props,4,location.pathname)
-    return this.props.currentPath !== nextProps.currentPath;
+    if (this.props.currentPath === nextProps.currentPath) {
+      return false;
+    }
+    return true;
   }
   renderRoute = config =>
     config.map(v => {
@@ -192,7 +195,7 @@ class TabRoute extends React.Component {
     );
   }
 }
-
+const accountInfo = JSON.parse(sessionStorage.getItem("accountInfo")) || {};
 @inject("configStore")
 @observer
 class MenuBar extends React.Component {
@@ -204,11 +207,13 @@ class MenuBar extends React.Component {
       tabData: []
     };
   }
+  menuConfig = accountInfo.menuConfig || [];
+  // menuConfig = config;
   componentDidMount() {
-    this.getCrumbObj();
-    this.initCrumbList(location.pathname);
+    this.props.configStore.getRouteInfo(this.menuConfig);
+    this.props.configStore.changeRoute(location.pathname + location.search);
+    console.log(toJS(this.props.configStore.routeInfo), "-=--==routeInfo");
     this.getDefaultKeys();
-    this.initTabData();
   }
   // static getDerivedStateFromProps(nextProps, prevState){
   //   console.log(nextProps,888,prevState)
@@ -217,51 +222,10 @@ class MenuBar extends React.Component {
 
   //初始化时获取默认展开菜单和默认打开页面
   getDefaultKeys = () => {
-    const selectedKeys = [location.pathname];
     const urlList = location.pathname.split("/").filter(i => i);
     const openKeys = urlList.slice(0, urlList.length - 1);
     this.setState({
-      selectedKeys,
       openKeys
-    });
-  };
-  //将所有label标签及对应的路由放入一个对象中
-  getCrumbObj = () => {
-    this.crumbObj = {};
-    this.getCrumbItem(this.menuConfig || []);
-  };
-  getCrumbItem = config => {
-    config.map(v => {
-      this.crumbObj[v.value] = v.title;
-      if (v.children) {
-        this.getCrumbItem(v.children);
-      }
-    });
-  };
-  //根据pathname计算crumbList
-  initCrumbList = path => {
-    let crumbList = [];
-    const urlList = path.split("/").filter(i => i);
-    for (let i = 0; i < urlList.length - 1; i++) {
-      crumbList.push(urlList[i]);
-    }
-    crumbList.push(path);
-    this.getCrumbList(crumbList);
-  };
-  getCrumbList = data => {
-    let crumbList = [];
-    data.map(v => crumbList.push(this.crumbObj[v]));
-    this.setState({
-      crumb: crumbList
-    });
-  };
-  initTabData = () => {
-    const { selectKeys, crumb } = this.state;
-    console.log(selectKeys, 456, crumb);
-    const path = location.pathname,
-      title = this.crumbObj[path];
-    this.setState({
-      tabData: [{ path, title, choose: true }]
     });
   };
   //展开收缩菜单
@@ -274,7 +238,7 @@ class MenuBar extends React.Component {
   renderMenuItem = config =>
     config.map(v => {
       if (!v.children) {
-        if (v.hide) return null;
+        if (v.detail) return null;
         return (
           <Menu.Item key={v.value}>
             {v.icon && <Icon type={v.icon} />}
@@ -301,74 +265,23 @@ class MenuBar extends React.Component {
   //点击菜单跳转
   changeRoute = e => {
     if (e.key === location.pathname) return;
-    this.initCrumbList(e.key);
-    // this.getCrumbList(e.keyPath);
-    this.updateTabData(e.key);
-    this.setState({
-      selectedKeys: e.key
-    });
+    this.props.configStore.changeRoute(e.key);
     this.props.history.push(e.key);
-  };
-  updateTabData = path => {
-    const oldTabs = [...this.state.tabData];
-    const exit = oldTabs.some(v => v.path === path);
-    oldTabs.map(v => (v.choose = false));
-    if (!exit) {
-      const newTab = {
-        path,
-        title: this.crumbObj[path],
-        choose: true
-      };
-      this.setState({
-        tabData: [...oldTabs, newTab]
-      });
-    } else {
-      const index = oldTabs.findIndex(v => v.path === path);
-      oldTabs[index].choose = true;
-      this.setState({
-        tabData: oldTabs
-      });
-    }
   };
   //点击切换tab
   clickTab = path => {
-    const oldTabs = [...this.state.tabData];
-    oldTabs.map(v => (v.choose = false));
-    const index = oldTabs.findIndex(v => v.path === path);
-    oldTabs[index].choose = true;
-    this.initCrumbList(path);
-    this.setState({
-      tabData: oldTabs,
-      selectedKeys: path
-    });
+    this.props.configStore.changeRoute(path);
+    console.log(path, "---");
     this.props.history.push(path);
   };
   //点击关闭tab
   closeTab = path => {
-    const oldTabs = [...this.state.tabData];
-    const index = oldTabs.findIndex(v => v.path === path);
-    //关闭正选中的标签
-    if (oldTabs[index].choose) {
-      let newIndex = index;
-      oldTabs.splice(index, 1);
-      if (index === oldTabs.length) {
-        newIndex = index - 1;
-      }
-      oldTabs.map(v => (v.choose = false));
-      oldTabs[newIndex].choose = true;
-      const newPath = oldTabs[newIndex].path;
-      this.initCrumbList(newPath);
-      this.setState({
-        tabData: oldTabs,
-        selectedKeys: newPath
-      });
-      this.props.history.push(newPath);
-    } else {
-      //关闭其他标签
-      oldTabs.splice(index, 1);
-      this.setState({
-        tabData: oldTabs
-      });
+    console.log(path, 2);
+    this.props.configStore.closeTab(path);
+    const { toPath } = this.props.configStore;
+    console.log(toPath, 2);
+    if (toPath) {
+      this.props.history.push(toPath);
     }
   };
 
@@ -422,7 +335,8 @@ class MenuBar extends React.Component {
       this.props.history.push("/login");
       return null;
     }
-    const { collapsed, selectedKeys, openKeys, crumb, tabData } = this.state;
+    const { breadCrumb, selectKey, tabData } = this.props.configStore;
+    const { collapsed, openKeys } = this.state;
     const dropMenu = (
       <Menu>
         {/*<Menu.Item onClick={this.showPsModal}>
@@ -434,9 +348,9 @@ class MenuBar extends React.Component {
         </Menu.Item>
       </Menu>
     );
-    const accountInfo = JSON.parse(sessionStorage.getItem("accountInfo")) || {};
+    /*const accountInfo = JSON.parse(sessionStorage.getItem('accountInfo')) || {};
     // this.menuConfig = accountInfo.menuConfig || [];
-    this.menuConfig = config || [];
+    this.menuConfig = config;*/
     return (
       <div className="menu-bar">
         <Layout>
@@ -448,7 +362,7 @@ class MenuBar extends React.Component {
             <Menu
               theme="dark"
               mode="inline"
-              selectedKeys={selectedKeys}
+              selectedKeys={selectKey}
               openKeys={openKeys}
               onOpenChange={this.openSubRoute}
               onClick={this.changeRoute}
@@ -463,7 +377,7 @@ class MenuBar extends React.Component {
                 type={collapsed ? "menu-unfold" : "menu-fold"}
                 onClick={this.toggle}
               />
-              {this.renderBreadcrumb(crumb)}
+              {this.renderBreadcrumb(breadCrumb)}
               <Dropdown className="fr click" overlay={dropMenu}>
                 <span>
                   <Avatar style={{ backgroundColor: "#87d068" }} icon="user" />
@@ -477,10 +391,9 @@ class MenuBar extends React.Component {
               closeTab={this.closeTab}
             />
             <Content>
-              {/*<a onClick={()=>this.props.history.push('/')}>ss</a>*/}
               <RenderRoute
                 config={this.menuConfig}
-                currentPath={selectedKeys}
+                currentPath={selectKey}
                 redirectPath={this.getDefaultRoute(this.menuConfig)}
               />
             </Content>

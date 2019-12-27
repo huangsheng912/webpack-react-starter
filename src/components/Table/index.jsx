@@ -3,7 +3,14 @@ import { Table, Pagination } from "antd";
 
 class CommonTable extends Component {
   render() {
-    const { columns, dataSource = [], total, loading, changeSize } = this.props;
+    const {
+      columns,
+      dataSource = [],
+      total,
+      loading,
+      changeSize,
+      currentPage
+    } = this.props;
     return (
       <div className="common-table">
         <Table
@@ -18,6 +25,7 @@ class CommonTable extends Component {
           showTotal={total => `共 ${total} 条记录`}
           hideOnSinglePage
           onChange={page => changeSize(page - 1)}
+          current={currentPage + 1}
         />
       </div>
     );
