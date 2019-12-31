@@ -7,7 +7,7 @@ import Table from "components/Table";
 import { transformNum, superLong } from "../../../utils/util";
 // import BroadcastModal from "./BroadcastModal";
 
-const { Option } = Select;
+const { TextArea } = Input;
 
 const configInfo = JSON.parse(localStorage.getItem("configInfo")) || {};
 class Main extends React.Component {
@@ -15,12 +15,16 @@ class Main extends React.Component {
     loading: true,
     hash: "",
     transferLoading: false,
+    transferInLoading: false,
     page: 0
   };
   componentDidMount() {
     this.getList();
   }
   async getList() {
+    this.setState({
+      loading: true
+    });
     const params = {
       page: this.state.page,
       size: 10
@@ -81,19 +85,22 @@ class Main extends React.Component {
       transferLoading: true
     });
     const params = {
-      txHash: txData.tx,
+      tx: txData.tx,
       toAddress: txData.toAddress,
       amount: txData.amount
     };
     try {
-      const res = await put("/api/coldWalletRecord/saveTransfer", params);
+      const res = await put("/api/coldWalletRecord/outTransfer", params);
       if (res.success) {
         message.success("交易成功");
-        this.setState({
-          hash: "",
-          toAddress: "",
-          amount: ""
-        });
+        this.setState(
+          {
+            hash: "",
+            toAddress: "",
+            amount: ""
+          },
+          this.getList
+        );
       } else {
         message.error(res.msg);
       }
@@ -106,6 +113,43 @@ class Main extends React.Component {
       });
     }
   };
+  transferInChange = (v, type) => {
+    this.setState({
+      [type]: v.target.value
+    });
+  };
+  transferIn = async () => {
+    const { inHash, inAddress, inAmount } = this.state;
+    if (!inHash || !inAddress || !inAmount) {
+      message.warning("请完善转入信息");
+      return;
+    }
+    this.setState({
+      transferInLoading: true
+    });
+    const params = {
+      txHash: inHash,
+      toAddress: inAddress,
+      amount: inAmount
+    };
+    const res = await put("/api/coldWalletRecord/saveTransfer", params);
+    if (res.success) {
+      message.success("交易成功");
+      this.setState(
+        {
+          inHash: "",
+          inAddress: "",
+          inAmount: ""
+        },
+        this.getList
+      );
+    } else {
+      message.error(res.msg);
+    }
+    this.setState({
+      transferInLoading: false
+    });
+  };
   render() {
     const {
       total,
@@ -114,6 +158,11 @@ class Main extends React.Component {
       hash,
       toAddress,
       amount,
+      transferLoading,
+      inHash,
+      inAddress,
+      inAmount,
+      transferInLoading,
       page
     } = this.state;
     const columns = [
@@ -134,7 +183,7 @@ class Main extends React.Component {
         )
       },
       {
-        title: "转出地址",
+        title: "交易地址",
         key: "address",
         dataIndex: "address"
       },
@@ -160,30 +209,70 @@ class Main extends React.Component {
         <div className="transfer-operate">
           <div className="shadow bg-white">
             <div className="content">
-              {this.state.transferLoading ? (
+              {transferLoading ? (
                 <div className="loading">
                   <Spin />
                 </div>
               ) : null}
-              <h3>USDT资金转入</h3>
+              <h3>ETH广播交易</h3>
               <div className="item">
-                <span>交易hash：</span>
-                <Input
-                  placeholder="请输入交易hash"
+                <TextArea
+                  style={{ minHeight: "180px" }}
                   value={hash}
                   onChange={this.hashChange}
                 />
               </div>
               <div className="item">
-                <span>转入地址：</span>
+                <span>交易地址：</span>
                 {toAddress}
               </div>
               <div className="item">
-                <span>到账数量：</span>
+                <span>交易数量：</span>
                 {amount}
               </div>
               <div className="btn-wrap">
                 <Button type="primary" size="large" onClick={this.broadcast}>
+                  广播交易
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="transfer-operate">
+          <div className="shadow bg-white">
+            <div className="content">
+              {transferInLoading ? (
+                <div className="loading">
+                  <Spin />
+                </div>
+              ) : null}
+              <h3 style={{ marginBottom: "50px" }}>USDT资金转入</h3>
+              <div className="item">
+                <span>交易hash：</span>
+                <Input
+                  placeholder="请输入交易hash"
+                  value={inHash}
+                  onChange={v => this.transferInChange(v, "inHash")}
+                />
+              </div>
+              <div className="item">
+                <span>转入地址：</span>
+                <Input
+                  placeholder="请输入转入地址"
+                  value={inAddress}
+                  onChange={v => this.transferInChange(v, "inAddress")}
+                />
+              </div>
+              <div className="item" style={{ marginBottom: "53px" }}>
+                <span>到账数量：</span>
+                <Input
+                  placeholder="请输入到账数量"
+                  value={inAmount}
+                  onChange={v => this.transferInChange(v, "inAmount")}
+                />
+              </div>
+              <div className="btn-wrap">
+                <Button type="primary" size="large" onClick={this.transferIn}>
                   转入
                 </Button>
               </div>

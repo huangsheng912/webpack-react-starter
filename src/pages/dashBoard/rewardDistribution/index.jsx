@@ -116,10 +116,10 @@ class Main extends React.Component {
     );
     this.props.history.push({
       pathname: "/dashBoard/rewardDistribution/detail",
-      query: {
+      /*query: {
         id: 456
-      },
-      search: "?ID=" + id
+      },*/
+      search: "?id=" + id
     });
   };
 

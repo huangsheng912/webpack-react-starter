@@ -16,10 +16,19 @@ function NormalCard(props) {
         {props.cards.map((v, i) => (
           <li key={i}>
             <p className="item-title">{v.name}</p>
-            <p className="item-value">
-              <span>{v.value || 0}</span>
-              {v.unit}
-            </p>
+            {Array.isArray(v.value) ? (
+              v.value.map((item, index) => (
+                <p key={index} className="item-value item-balance">
+                  <span>{item}</span>
+                  {v.unit[index]}
+                </p>
+              ))
+            ) : (
+              <p className="item-value">
+                <span>{v.value || 0}</span>
+                {v.unit}
+              </p>
+            )}
           </li>
         ))}
       </ul>
@@ -188,13 +197,21 @@ class Main extends React.Component {
       liabilities
     } = this.state;
     const walletData = [
-      { name: "准备金账户余额", value: hotWalletUsdtBalance, unit: "USDT" },
+      {
+        name: "准备金账户余额",
+        value: [hotWalletEthBalance, hotWalletUsdtBalance],
+        unit: ["ETH", "USDT"]
+      },
       { name: "当前准备金率", value: hotWalletRate },
       { name: "今日快速提现剩余额度", value: todayRedeemBalance, unit: "USDI" },
-      { name: "待处理的大额提现数量", value: bigRedeemTotal, unit: "USDI" },
       { name: "缺口", value: difference, unit: "USDT" },
-      { name: "冷钱包余额", value: coldWalletUsdtBalance, unit: "USDT" },
-      { name: "合约地址ETH余额", value: hotWalletEthBalance, unit: "ETH" }
+      {
+        name: "冷钱包余额",
+        value: [coldWalletEthBalance, coldWalletUsdtBalance],
+        unit: ["ETH", "USDT"]
+      },
+      // { name: '合约地址ETH余额', value: hotWalletEthBalance, unit: 'ETH'},
+      { name: "待处理的大额提现数量", value: bigRedeemTotal, unit: "USDI" }
     ];
     const userAssetsData = [
       { name: "持币总数", value: assetTotal, unit: "USDI" },

@@ -212,13 +212,17 @@ class MenuBar extends React.Component {
   componentDidMount() {
     this.props.configStore.getRouteInfo(this.menuConfig);
     this.props.configStore.changeRoute(location.pathname + location.search);
-    console.log(toJS(this.props.configStore.routeInfo), "-=--==routeInfo");
+    // console.log(toJS(this.props.configStore.routeInfo), '-=--==routeInfo')
     this.getDefaultKeys();
   }
   // static getDerivedStateFromProps(nextProps, prevState){
   //   console.log(nextProps,888,prevState)
   //   return null
   // }
+  UNSAFE_componentWillReceiveProps(nextProps, nextContext) {
+    this.props.configStore.changeRoute(location.pathname + location.search);
+    // console.log(nextProps,456,this.props)
+  }
 
   //初始化时获取默认展开菜单和默认打开页面
   getDefaultKeys = () => {
@@ -265,21 +269,18 @@ class MenuBar extends React.Component {
   //点击菜单跳转
   changeRoute = e => {
     if (e.key === location.pathname) return;
-    this.props.configStore.changeRoute(e.key);
+    // this.props.configStore.changeRoute(e.key);
     this.props.history.push(e.key);
   };
   //点击切换tab
   clickTab = path => {
-    this.props.configStore.changeRoute(path);
-    console.log(path, "---");
+    // this.props.configStore.changeRoute(path);
     this.props.history.push(path);
   };
   //点击关闭tab
   closeTab = path => {
-    console.log(path, 2);
     this.props.configStore.closeTab(path);
     const { toPath } = this.props.configStore;
-    console.log(toPath, 2);
     if (toPath) {
       this.props.history.push(toPath);
     }
@@ -307,7 +308,7 @@ class MenuBar extends React.Component {
     const res = await get("/usdi/account/list");
     if (res.success) {
       message.success("修改成功，请重新登录");
-      this.props.configStore.changeConfig({});
+      this.props.configStore.clearLoginInfo();
       sessionStorage.removeItem("accountInfo");
       this.props.history.push("/login");
       return true;
@@ -316,7 +317,7 @@ class MenuBar extends React.Component {
     }
   };
   logOut = () => {
-    this.props.configStore.changeConfig({});
+    this.props.configStore.clearLoginInfo();
     sessionStorage.removeItem("accountInfo");
     this.props.history.push("/login");
   };
@@ -331,10 +332,6 @@ class MenuBar extends React.Component {
     return defaultRoute;
   };
   render() {
-    if (!this.props.configStore.tokenId) {
-      this.props.history.push("/login");
-      return null;
-    }
     const { breadCrumb, selectKey, tabData } = this.props.configStore;
     const { collapsed, openKeys } = this.state;
     const dropMenu = (
@@ -348,9 +345,6 @@ class MenuBar extends React.Component {
         </Menu.Item>
       </Menu>
     );
-    /*const accountInfo = JSON.parse(sessionStorage.getItem('accountInfo')) || {};
-    // this.menuConfig = accountInfo.menuConfig || [];
-    this.menuConfig = config;*/
     return (
       <div className="menu-bar">
         <Layout>

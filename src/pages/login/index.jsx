@@ -1,9 +1,9 @@
 import React, { Component } from "react";
+import { Redirect } from "react-router-dom";
 import "./index.less";
-import { Form, Input, Button, Icon, Modal, message } from "antd";
+import { Form, Input, Button, Icon, message } from "antd";
 import { post } from "utils/request";
 import { observer, inject } from "mobx-react";
-import routeConfig from "src/router/config";
 
 const formItemLayout = {
   labelCol: { span: 8 },
@@ -25,17 +25,6 @@ class Login extends Component {
             message.error("获取菜单失败");
             return;
           }
-          /* const newMenu = [];
-          res.data.menus.map(v=>{
-            routeConfig.map(route=>{
-              if (v.title === route.title) {
-                v.icon = route.icon;
-                if (route.selectKey) {
-                  v.selectKey = route.selectKey;
-                }
-              }
-            })
-          });*/
           const configInfo = {
             menuConfig: res.data.menus,
             userName: res.data.userName,
@@ -45,25 +34,20 @@ class Login extends Component {
           };
           this.props.configStore.changeConfig(configInfo);
           sessionStorage.setItem("accountInfo", JSON.stringify(configInfo));
-          const defaultRoute = this.getDefaultRoute(res.data.menus);
-          this.props.history.push(defaultRoute);
+          const { redirect } = this.props.location.state || "/";
+          this.props.history.push(redirect);
         } else {
           message.error(res.msg);
         }
       }
     });
   };
-  getDefaultRoute = config => {
-    let defaultRoute = "/";
-    if (!config[0].children) {
-      defaultRoute = config[0].value;
-    } else {
-      defaultRoute = config[0].children[0].value;
-    }
-    return defaultRoute;
-  };
   render() {
     const { getFieldDecorator } = this.props.form;
+    const { tokenId } = this.props.configStore;
+    if (tokenId) {
+      return <Redirect to="/" />;
+    }
     return (
       <div className="login">
         <div className="login-content">

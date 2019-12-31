@@ -35,6 +35,7 @@ class config {
   }
 
   @action changeRoute = path => {
+    if (path === "/login") return;
     if (path.indexOf("?") > -1) {
       this.routeInfo[path] = this.routeInfo[path.split("?")[0]];
     }
@@ -101,6 +102,14 @@ class config {
       this.toPath = "";
     }
   };
+  @action clearLoginInfo() {
+    this.tokenId = "";
+    this.routeInfo = {};
+    this.tabData = [];
+    this.selectKey = "";
+    this.breadCrumb = [];
+    this.toPath = "";
+  }
 }
 
 export default config;

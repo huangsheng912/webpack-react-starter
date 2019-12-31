@@ -12,8 +12,40 @@ import loadable from "@loadable/component";
 const Login = loadable(() => import("page/login"));
 const Menu = loadable(() => import("components/Menu"));
 import { get } from "utils/request";
+import { inject, observer } from "mobx-react";
 
 moment.locale("zh-cn");
+
+//权限路由
+@inject("configStore")
+@observer
+class AuthRoute extends React.Component {
+  componentDidMount() {
+    console.log("挂载了！！！");
+  }
+  render() {
+    const { component: Comp, ...rest } = this.props;
+    const { tokenId } = this.props.configStore;
+    return (
+      <Route
+        {...rest}
+        render={props =>
+          tokenId ? (
+            <Comp {...props} />
+          ) : (
+            <Redirect
+              to={{
+                pathname: "/login",
+                state: { redirect: props.location.pathname }
+              }}
+            />
+          )
+        }
+      />
+    );
+  }
+}
+
 class App extends React.Component {
   componentDidMount() {
     this.getConfigInfo();
@@ -39,7 +71,7 @@ class App extends React.Component {
           <ConfigProvider locale={zhCN}>
             <Switch>
               <Route path="/login" exact component={Login} />
-              <Route path="*" component={Menu} />
+              <AuthRoute path="/" component={Menu} />
             </Switch>
           </ConfigProvider>
         </BrowserRouter>
