@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Button, Input, message, Modal, Spin } from "antd";
 const { TextArea } = Input;
 import "./index.less";
-import { post, put } from "utils/request";
+import { put } from "utils/request";
 
 class Main extends Component {
   state = {

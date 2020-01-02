@@ -1,4 +1,4 @@
-import { observable, action, toJS, configure } from "mobx";
+import { observable, action, configure } from "mobx";
 configure({ enforceActions: "observed" }); //开启严格模式，必须使用action来改变可观察对象
 
 const configInfo = JSON.parse(sessionStorage.getItem("accountInfo")) || {};

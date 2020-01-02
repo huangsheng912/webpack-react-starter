@@ -101,7 +101,7 @@ class Main extends React.Component {
     );
   };
   //分页
-  changeSize = (page, size) => {
+  changeSize = page => {
     this.setState(
       {
         tableLoading: true,

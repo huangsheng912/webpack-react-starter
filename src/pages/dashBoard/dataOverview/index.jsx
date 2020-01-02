@@ -181,7 +181,6 @@ class Main extends React.Component {
       bigRedeemTotal,
       userCount,
       smallBalanceUserCount,
-      effectiveUserCount,
       yesterdayAddUserCount,
       assetTotal,
       effectiveAssetTotal,

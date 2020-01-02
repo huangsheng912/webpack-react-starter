@@ -14,6 +14,10 @@ const Menu = loadable(() => import("components/Menu"));
 import { get } from "utils/request";
 import { inject, observer } from "mobx-react";
 
+import { Provider as ProviderForRedux } from "react-redux";
+import storeForRedux from "src/pages/ReduxTodo/store";
+import ReduxTodo from "src/pages/ReduxTodo";
+
 moment.locale("zh-cn");
 
 //权限路由
@@ -79,4 +83,18 @@ class App extends React.Component {
     );
   }
 }
-export default hot(module)(App);
+
+class AppForRedux extends React.Component {
+  render() {
+    return (
+      <ProviderForRedux store={storeForRedux}>
+        <ConfigProvider locale={zhCN}>
+          <ReduxTodo />
+        </ConfigProvider>
+      </ProviderForRedux>
+    );
+  }
+}
+
+export default hot(module)(AppForRedux);
+// export default hot(module)(App);

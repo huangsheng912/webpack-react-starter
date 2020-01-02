@@ -5,11 +5,6 @@ import { Form, Input, Button, Icon, message } from "antd";
 import { post } from "utils/request";
 import { observer, inject } from "mobx-react";
 
-const formItemLayout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 10 }
-};
-
 @Form.create()
 @inject("configStore")
 @observer

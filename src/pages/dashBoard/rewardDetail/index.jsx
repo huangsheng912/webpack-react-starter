@@ -60,7 +60,7 @@ class Main extends React.Component {
   //输入框回调
   changeAddress(v, type) {
     this.setState({
-      [type]: val
+      [type]: v
     });
   }
   //列表查询
@@ -74,7 +74,7 @@ class Main extends React.Component {
     );
   };
   //分页
-  changeSize = (page, size) => {
+  changeSize = page => {
     this.setState(
       {
         tableLoading: true,

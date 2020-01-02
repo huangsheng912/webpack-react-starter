@@ -65,7 +65,6 @@ class Main extends React.Component {
   }
   //列表查询
   doSearch = () => {
-    const { type, status, minAmount, maxAmount } = this.state;
     this.setState(
       {
         tableLoading: true,
@@ -75,7 +74,7 @@ class Main extends React.Component {
     );
   };
   //分页
-  changeSize = (page, size) => {
+  changeSize = page => {
     this.setState(
       {
         tableLoading: true,
@@ -98,11 +97,6 @@ class Main extends React.Component {
       { label: "全部", value: "All" },
       { label: "兑换", value: "Convert" },
       { label: "赎回", value: "Redeem" }
-    ];
-    const statusType = [
-      { label: "全部", value: "All" },
-      { label: "已确认", value: "Confirm" },
-      { label: "未确认", value: "Pending" }
     ];
     const orderStateType = [
       { label: "全部", value: "" },

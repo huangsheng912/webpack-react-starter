@@ -1,15 +1,15 @@
 import React from "react";
 import "./index.less";
-import { Button, Select, Modal, Input, message, Spin } from "antd";
+import { Button, Input, message, Spin } from "antd";
 import { get, put } from "utils/request";
 import moment from "moment";
 import Table from "components/Table";
-import { transformNum, superLong } from "../../../utils/util";
+// import { transformNum, superLong } from "../../../utils/util";
 // import BroadcastModal from "./BroadcastModal";
 
 const { TextArea } = Input;
 
-const configInfo = JSON.parse(localStorage.getItem("configInfo")) || {};
+// const configInfo = JSON.parse(localStorage.getItem("configInfo")) || {};
 class Main extends React.Component {
   state = {
     loading: true,
@@ -41,7 +41,7 @@ class Main extends React.Component {
       });
     }
   }
-  changeSize = (page, size) => {
+  changeSize = page => {
     this.setState(
       {
         loading: true,

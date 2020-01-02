@@ -20,6 +20,7 @@ class Main extends React.Component {
     this.getList();
   }
   UNSAFE_componentWillReceiveProps(nextProps, nextContext) {
+    console.log(nextProps, nextContext, "456");
     let newId = nextProps.location.search;
     const oldId = this.props.location.search;
     if (newId && newId !== oldId) {
@@ -103,7 +104,7 @@ class Main extends React.Component {
     );
   };
   //分页
-  changeSize = (page, size) => {
+  changeSize = page => {
     this.setState(
       {
         tableLoading: true,

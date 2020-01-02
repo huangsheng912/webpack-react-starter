@@ -1,6 +1,6 @@
 import React from "react";
 import "./index.less";
-import { Button, Input, Select, Modal } from "antd";
+import { Button, Input, Select } from "antd";
 import { get } from "utils/request";
 import moment from "moment";
 import AddressModal from "./AddressModal";
@@ -60,7 +60,7 @@ class Main extends React.Component {
       this.getList
     );
   };
-  changeSize = (page, size) => {
+  changeSize = page => {
     this.setState(
       {
         loading: true,

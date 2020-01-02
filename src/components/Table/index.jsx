@@ -16,7 +16,7 @@ class CommonTable extends Component {
         <Table
           columns={columns}
           dataSource={dataSource}
-          rowKey={record => Math.random() * 1000}
+          rowKey={() => Math.random() * 1000}
           pagination={false}
           loading={loading}
         />

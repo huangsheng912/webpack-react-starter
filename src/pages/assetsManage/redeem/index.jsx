@@ -4,7 +4,7 @@ import { Button, message, Select } from "antd";
 import { get, post } from "utils/request";
 import moment from "moment";
 import Table from "components/Table";
-import { transformNum, superLong } from "../../../utils/util";
+import { transformNum } from "../../../utils/util";
 
 const { Option } = Select;
 
@@ -79,7 +79,7 @@ class Main extends React.Component {
     }
   };
 
-  changeSize = (page, size) => {
+  changeSize = page => {
     this.setState(
       {
         loading: true,
@@ -98,13 +98,6 @@ class Main extends React.Component {
       { label: "确认中", value: "Confirming" },
       { label: "已完成", value: "Complete" },
       { label: "失败", value: "Fail" }
-    ];
-    const businessType = [
-      { label: "全部", value: "0" },
-      { label: "转账交易", value: "Transaction" },
-      { label: "兑换", value: "Convert" },
-      { label: "赎回", value: "Redeem" },
-      { label: "收益", value: "Earnings" }
     ];
     const columns = [
       {

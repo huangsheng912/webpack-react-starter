@@ -67,7 +67,6 @@ class Main extends React.Component {
     });
   }
   doSearch = () => {
-    const { minBalance, maxBalance, minIncome, maxIncome } = this.state;
     this.setState(
       {
         page: 0,
@@ -76,7 +75,7 @@ class Main extends React.Component {
       this.getList
     );
   };
-  changeSize = (page, size) => {
+  changeSize = page => {
     this.setState(
       {
         tableLoading: true,
