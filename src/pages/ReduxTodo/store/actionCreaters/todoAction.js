@@ -1,5 +1,7 @@
+import { ADD_TODO, TOGGLE_TODO, FILTER_TODO } from "../constant";
+
 export const addTodo = value => ({
-  type: "ADD_TODO",
+  type: ADD_TODO,
   preload: {
     id: new Date().getTime(),
     complete: false,
@@ -8,12 +10,12 @@ export const addTodo = value => ({
 });
 
 export const toggleTodo = id => ({
-  type: "TOGGLE_TODO",
+  type: TOGGLE_TODO,
   preload: { id }
 });
 
 export const filterTodo = type => ({
-  type: "FILTER_TODO",
+  type: FILTER_TODO,
   preload: { type }
 });
 

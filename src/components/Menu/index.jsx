@@ -1,7 +1,7 @@
 import React from "react";
 import "./index.less";
 import config from "../../router/config";
-import logo from "src/images/logo.png";
+import logo from "src/images/img2.png";
 import { Redirect, Route, Switch } from "react-router-dom";
 import { get } from "utils/request";
 import AsyncComponent from "page/AsyncComponent";
