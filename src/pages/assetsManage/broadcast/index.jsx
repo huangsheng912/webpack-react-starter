@@ -1,7 +1,7 @@
 import React from "react";
 import "./index.less";
 import { Button, Input, message, Spin } from "antd";
-import { get, put } from "utils/request";
+import { get, post, put } from "utils/request";
 import moment from "moment";
 import Table from "components/Table";
 // import { transformNum, superLong } from "../../../utils/util";
@@ -132,23 +132,29 @@ class Main extends React.Component {
       toAddress: inAddress,
       amount: inAmount
     };
-    const res = await put("/api/coldWalletRecord/saveTransfer", params);
-    if (res.success) {
-      message.success("交易成功");
-      this.setState(
-        {
-          inHash: "",
-          inAddress: "",
-          inAmount: ""
-        },
-        this.getList
-      );
-    } else {
-      message.error(res.msg);
+    try {
+      const res = await post("/api/coldWalletRecord/saveTransfer", params);
+      if (res.success) {
+        message.success("交易成功");
+        this.setState(
+          {
+            inHash: "",
+            inAddress: "",
+            inAmount: ""
+          },
+          this.getList
+        );
+      } else {
+        message.error(res.msg);
+      }
+      this.setState({
+        transferInLoading: false
+      });
+    } catch (e) {
+      this.setState({
+        transferInLoading: false
+      });
     }
-    this.setState({
-      transferInLoading: false
-    });
   };
   render() {
     const {
