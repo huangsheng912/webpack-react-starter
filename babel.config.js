@@ -3,7 +3,7 @@ module.exports = {
     [
       "@babel/preset-env",
       {
-        useBuiltIns: "usage",
+        useBuiltIns: "usage", //按需引入polyfill
         corejs: 2
       }
     ],
@@ -11,11 +11,11 @@ module.exports = {
   ],
   plugins: [
     "react-hot-loader/babel",
-    "@babel/plugin-transform-runtime",
+    "@babel/plugin-transform-runtime", //配合preset-env，避免polyfill造成污染
     "@babel/plugin-syntax-dynamic-import",
     ["@babel/plugin-proposal-decorators", { legacy: true }],
     ["@babel/plugin-proposal-class-properties", { loose: true }],
-    ["import", { libraryName: "antd", libraryDirectory: "es", style: true }]
+    ["import", { libraryName: "antd", libraryDirectory: "es", style: true }] //antd按需加载
   ],
   ignore: [/[\/\\]core-js/, /@babel[\/\\]runtime/], //防止babel babeling它自己
   sourceType: "unambiguous" //防止babel弄乱导出

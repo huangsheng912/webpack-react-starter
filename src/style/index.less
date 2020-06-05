@@ -5,9 +5,6 @@
   box-sizing: border-box;
 }
 html {
-  background-color: #f9fafd;
-}
-html {
   body,
   div,
   dl,
@@ -37,7 +34,6 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
-fieldset,
 img {
   border: 0;
 }
@@ -56,10 +52,6 @@ var {
 ol,
 ul {
   list-style: none;
-}
-q:before,
-q:after {
-  content: " ";
 }
 a {
   text-decoration: none;
@@ -82,13 +74,6 @@ a:focus {
 .tr {
   text-align: right;
 }
-u {
-  text-decoration: none;
-}
-.td {
-  text-decoration: none;
-  border-bottom: 1px solid #608fff;
-}
 .fw {
   font-weight: bold;
 }
@@ -104,19 +89,11 @@ u {
 .hidden {
   overflow: hidden;
 }
-.none {
-  display: none;
-}
 .black {
   color: #000;
 }
 .gray {
   color: #808080;
-}
-.bg-white {
-  background-color: #fff;
-  padding: 20px;
-  margin-bottom: 30px;
 }
 
 .font14 {
@@ -141,14 +118,6 @@ u {
 
 .font30 {
   font-size: 30px;
-}
-
-.fw_n {
-  font-weight: 400;
-}
-
-.transparent {
-  color: transparent;
 }
 
 .click {
@@ -203,30 +172,13 @@ u {
 .shadow {
   box-shadow: 0px 0px 20px #ccc;
 }
-body,
-html {
-  background-color: #ffffff;
-}
 
 input::-webkit-input-placeholder,
 textarea::-webkit-input-placeholder {
   font-size: 14px;
 }
 
-input:-moz-placeholder,
-textarea:-moz-placeholder {
-  font-size: 14px;
-}
-
-input::-moz-placeholder,
-textarea::-moz-placeholder {
-  font-size: 14px;
-}
-
-input:-ms-input-placeholder,
-textarea:-ms-input-placeholder {
-  font-size: 14px;
-}
+/* 去除webkit中input的type="number"时出现的上下图标 */
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
@@ -235,26 +187,46 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-/* 滚动槽 */
-.scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+/*input文本框自动填充背景色*/
+input:-webkit-autofill {
+  box-shadow: 0 0 0 1000px #fff inset !important;
 }
-.scrollbar::-webkit-scrollbar-track {
-  border-radius: 3px;
-  background: rgba(0, 0, 0, 0.06);
-  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.08);
+
+// 纵向滚动条和横向滚动条宽度
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
 }
-/* 滚动条滑块 */
-.scrollbar::-webkit-scrollbar-thumb {
-  border-radius: 3px;
-  background: rgba(0, 0, 0, 0.12);
-  -webkit-box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+// 滚动条轨道样式
+::-webkit-scrollbar-track {
+  background-color: transparent;
+  outline: none;
 }
-.scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
+// 滚动条滑块样式
+::-webkit-scrollbar-thumb {
+  border-radius: 2px;
+  //-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+  background: transparent;
+}
+:hover::-webkit-scrollbar-thumb {
+  background: #d8d8d8;
+}
+
+.clear:after,
+.clear:before {
+  content: "";
+  display: block;
+  clear: both;
 }
 
 #app {
   height: 100%;
+}
+
+.editor-wrap {
+  .w-e-panel-tab-title {
+    li:last-child {
+      display: none;
+    }
+  }
 }
