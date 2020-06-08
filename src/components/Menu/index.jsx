@@ -1,4 +1,5 @@
 import React from "react";
+import Loadable from "react-loadable";
 import "./index.less";
 import config from "../../router/config";
 import logo from "src/images/img2.png";
@@ -130,7 +131,10 @@ class RenderRoute extends React.Component {
   //避免menu组件setState导致异步组件多次重复加载
   shouldComponentUpdate(nextProps, nextState, nextContext) {
     // console.log(nextProps,1,nextState,2,nextContext,3,this.props,4,location.pathname)
-    if (this.props.currentPath === nextProps.currentPath) {
+    if (
+      this.props.currentPath === nextProps.currentPath ||
+      !this.props.currentPath
+    ) {
       return false;
     }
     return true;
@@ -138,13 +142,15 @@ class RenderRoute extends React.Component {
   renderRoute = config =>
     config.map(v => {
       if (!v.children) {
+        const LoadableBar = Loadable({
+          loader: () => import("../../pages" + v.value),
+          loading() {
+            return null;
+          }
+        });
+        // const LoadableBar = AsyncComponent(() => import("../../pages" + v.value))
         return (
-          <Route
-            exact
-            path={v.value}
-            key={v.value}
-            component={AsyncComponent(() => import("../../pages" + v.value))}
-          />
+          <Route exact path={v.value} key={v.value} component={LoadableBar} />
         );
       }
       return this.renderRoute(v.children);
@@ -206,9 +212,11 @@ class MenuBar extends React.Component {
       crumb: [],
       tabData: []
     };
+    //从接口读取菜单
+    // this.menuConfig = this.props.configStore.configInfo.menuConfig || [];
+    //本地菜单
+    this.menuConfig = config;
   }
-  menuConfig = accountInfo.menuConfig || [];
-  // menuConfig = config;
   componentDidMount() {
     this.props.configStore.getRouteInfo(this.menuConfig);
     this.props.configStore.changeRoute(location.pathname + location.search);
@@ -220,7 +228,10 @@ class MenuBar extends React.Component {
   //   return null
   // }
   UNSAFE_componentWillReceiveProps(nextProps, nextContext) {
-    this.props.configStore.changeRoute(location.pathname + location.search);
+    if (nextProps.location.pathname === "/") return;
+    this.props.configStore.changeRoute(
+      nextProps.location.pathname + nextProps.location.search
+    );
     // console.log(nextProps,456,this.props)
   }
 

@@ -10,7 +10,7 @@ module.exports = {
     "@babel/preset-react"
   ],
   plugins: [
-    "react-hot-loader/babel",
+    // "react-hot-loader/babel",
     "@babel/plugin-transform-runtime", //配合preset-env，避免polyfill造成污染
     "@babel/plugin-syntax-dynamic-import",
     ["@babel/plugin-proposal-decorators", { legacy: true }],

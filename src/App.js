@@ -3,22 +3,28 @@ import "./style";
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
 import { Provider } from "mobx-react";
 import store from "./store";
-import { hot } from "react-hot-loader";
+import { hot } from "react-hot-loader/root";
 import { ConfigProvider } from "antd";
 import zhCN from "antd/es/locale/zh_CN";
-import moment from "moment";
-import "moment/locale/zh-cn";
-import loadable from "@loadable/component";
-const Login = loadable(() => import("page/login"));
-const Menu = loadable(() => import("components/Menu"));
+
+import Loadable from "react-loadable";
+const LoadableBar = function(loader) {
+  return Loadable({
+    loader,
+    loading() {
+      return null;
+    }
+  });
+};
+const Login = LoadableBar(() => import("page/login"));
+const Menu = LoadableBar(() => import("components/Menu"));
+
 import { get } from "utils/request";
 import { inject, observer } from "mobx-react";
 
 import { Provider as ProviderForRedux } from "react-redux";
 import storeForRedux from "src/pages/ReduxTodo/store";
 import ReduxTodo from "src/pages/ReduxTodo";
-
-moment.locale("zh-cn");
 
 //权限路由
 @inject("configStore")
@@ -96,5 +102,5 @@ class AppForRedux extends React.Component {
   }
 }
 
-export default hot(module)(AppForRedux);
-// export default hot(module)(App);
+// export default hot(AppForRedux);
+export default hot(App);

@@ -1,5 +1,13 @@
-import loadable from "@loadable/component";
+import Loadable from "react-loadable";
 
+const loadable = function(loader) {
+  return Loadable({
+    loader,
+    loading() {
+      return null;
+    }
+  });
+};
 const DataOverview = loadable(() => import("page/dashBoard/dataOverview"));
 const AccountAddress = loadable(() => import("page/dashBoard/accountAddress"));
 const Redemption = loadable(() => import("page/dashBoard/redemption"));

@@ -4,7 +4,7 @@ const webpack = require("webpack");
 const commonConfig = require("./webpack.base.config.js");
 const openBrowserPlugin = require("open-browser-webpack-plugin");
 
-const PORT = process.env.PORT || 8882
+const PORT = process.env.PORT || 8881
 
 module.exports = merge(commonConfig, {
   mode: "development",

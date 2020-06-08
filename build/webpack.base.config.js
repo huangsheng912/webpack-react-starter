@@ -20,7 +20,8 @@ module.exports = {
       src: path.resolve(__dirname, "../src"), //设置引入路径别名
       page: path.resolve(__dirname, "../src/pages"),
       utils: path.resolve(__dirname, "../src/utils"),
-      components: path.resolve(__dirname, "../src/components")
+      components: path.resolve(__dirname, "../src/components"),
+      // "react-dom": "@hot-loader/react-dom" //menu 通过map动态import路由+react-hot-loader实现热替换异常，添加后热更新都出问题
     },
     modules: ["node_modules"] //webpack解析模块时应该搜索的目录
   },
