@@ -1,10 +1,12 @@
-import { observable, action, configure } from "mobx";
+import { observable, action, toJS, configure } from "mobx";
 configure({ enforceActions: "observed" }); //开启严格模式，必须使用action来改变可观察对象
 
-const configInfo = JSON.parse(sessionStorage.getItem("accountInfo")) || {};
+const info = JSON.parse(sessionStorage.getItem("configInfo")) || {};
 class config {
   @observable
-  tokenId = configInfo.tokenId || "";
+  tokenId = info.tokenId || "";
+  @observable
+  configInfo = info;
   @observable
   routeInfo = {};
   @observable
@@ -17,6 +19,8 @@ class config {
   toPath = "";
   @action changeConfig(item = {}) {
     this.tokenId = item.tokenId;
+    this.configInfo = item;
+    sessionStorage.setItem("configInfo", JSON.stringify(item));
   }
 
   @action initRouteInfo(routes = []) {
@@ -109,6 +113,7 @@ class config {
     this.selectKey = "";
     this.breadCrumb = [];
     this.toPath = "";
+    sessionStorage.removeItem("configInfo");
   }
 }
 

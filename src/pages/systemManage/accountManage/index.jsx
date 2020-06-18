@@ -10,17 +10,26 @@ import {
   Modal,
   message
 } from "antd";
-import { get } from "utils/request";
+import { post } from "utils/request";
 import moment from "moment";
 import EditModal from "./EditModal";
+import { inject, observer } from "mobx-react";
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
+@inject("configStore")
+@observer
 class Main extends React.Component {
   state = {
     loading: true,
-    page: 0
+    pageNumber: 0,
+    pageSize: 10,
+    status: "",
+    startTime: "",
+    endTime: "",
+    search: "",
+    editId: "" //编辑用户id
   };
   componentDidMount() {
     this.getList();
@@ -30,19 +39,19 @@ class Main extends React.Component {
       loading: true
     });
     const params = {
-      page: this.state.page,
-      size: 10,
-      status: this.state.status,
-      minTime: this.state.minTime,
-      maxTime: this.state.maxTime,
-      search: this.state.search
+      pageNumber: this.state.pageNumber,
+      pageSize: this.state.pageSize,
+      statusType: this.state.status,
+      startTime: this.state.startTime,
+      endTime: this.state.endTime,
+      searchText: this.state.search
     };
-    const res = await get("/usdi/account/list", params);
-    if (res.success) {
+    const res = await post("", "adminPageList", params);
+    if (res.result) {
       this.setState({
         loading: false,
-        total: res.data.total,
-        tableList: res.data.list
+        total: res.result.totalCount,
+        tableList: res.result.list
       });
     }
   }
@@ -56,6 +65,17 @@ class Main extends React.Component {
     );
   };
   onTimeChange = (value, dateString) => {
+    if (value.length) {
+      this.setState({
+        startTime: moment(value[0]).format("YYYY-MM-DD") + " 00:00:00",
+        endTime: moment(value[1]).format("YYYY-MM-DD") + " 23:59:59"
+      });
+    } else {
+      this.setState({
+        startTime: "",
+        endTime: ""
+      });
+    }
     console.log("Selected Time: ", value);
     console.log("Formatted Selected Time: ", dateString);
   };
@@ -64,17 +84,16 @@ class Main extends React.Component {
     this.setState(
       {
         loading: true,
-        page: 0
+        pageNumber: 0
       },
       this.getList
     );
-    console.log(this.state, "---state");
   };
   //表格翻页
   changeSize = page => {
     this.setState(
       {
-        page
+        pageNumber: page
       },
       this.getList
     );
@@ -85,17 +104,18 @@ class Main extends React.Component {
       modalTitle: "新建用户"
     });
     this.editModal.visible();
-    console.log(this.editModal, "-ssss");
   };
   //编辑
   editUserInfo = record => {
     this.setState({
-      modalTitle: "编辑用户信息"
+      modalTitle: "编辑用户信息",
+      editId: record.id
     });
     this.editModal.props.form.setFieldsValue({
-      phone: record.phone,
-      name: record.name,
-      userName: record.userName
+      mobile: record.mobile,
+      realName: record.realName,
+      userName: record.userName,
+      company: record.company
     });
     this.editModal.visible();
   };
@@ -104,38 +124,103 @@ class Main extends React.Component {
     console.log(userInfo, "---userInfo");
     this.setState(
       {
-        page: 0,
-        status: "All",
-        minTime: "",
-        maxTime: "",
+        pageNumber: 0,
+        status: "",
+        startTime: "",
+        endTime: "",
         search: ""
       },
       this.getList
     );
   };
-  //重置密码，启用/禁用弹框
-  showConfirm = title => {
+
+  showConfirm = ({ title, record, cb }) => {
     Modal.confirm({
       title: title,
       content: "",
-      onOk: () => this.doConfirm(title),
+      onOk: () => cb(record),
       onCancel() {}
     });
   };
-  doConfirm = async title => {
-    console.log(title, "---00");
-    if (title === "确认重置该用户密码") {
-      const res = await get("/usdi/account/edit");
-      if (res.success) {
-        message.success("重置成功");
+  //重置密码
+  resetPs = async record => {
+    const params = {
+      id: record.id,
+      password: "Yuyanji360"
+    };
+    const res = await post("", "resetPwd", params);
+    if (res.result) {
+      message.success("重置成功");
+      const myId = this.props.configStore.configInfo.userId;
+      if (id === myId) {
+        this.props.configStore.clearLoginInfo();
+        this.props.history.push("/login");
+      }
+    }
+  };
+  /*doConfirm = async (title, record) => {
+    console.log(title,'---00')
+    if (title === '确认重置该用户密码？') {
+      const params = {
+        id: record.id,
+        password: 'Yuyanji360'
+      }
+      const res = await post('','resetPwd', params);
+      if (res.result) {
+        message.success('重置成功,请重新登录')
+        const myId = this.props.configStore.configInfo.userId
+        if (id === myId) {
+          this.props.configStore.clearLoginInfo()
+          this.props.history.push('/login')
+        }
       }
     } else {
       //启用禁用
-      const res = await get("/usdi/account/edit");
-      if (res.success) {
-        message.success("设置成功");
+      const params = {
+        id: record.id,
+        admin: !record.admin
+      }
+      const res = await post('', 'markAdmin', params);
+      if (res.result) {
+        message.success('设置成功')
+        this.getList()
+      }
+    }
+  }*/
+
+  //设置管理员
+  setAdmin = async record => {
+    const params = {
+      id: record.id,
+      admin: !record.admin
+    };
+    const res = await post("", "markAdmin", params);
+    if (res.result) {
+      message.success("设置成功");
+      this.getList();
+    }
+  };
+  //删除管理员
+  delAdmin = async record => {
+    const res = await post("", "record", { id: record.id });
+    if (res.result) {
+      message.success("设置成功");
+      const myId = this.props.configStore.configInfo.userId;
+      if (id === myId) {
+        this.props.configStore.clearLoginInfo();
+        this.props.history.push("/login");
+      } else {
         this.getList();
       }
+    }
+  };
+  logout = async () => {
+    const myId = this.props.configStore.configInfo.userId;
+    if (id === myId) {
+      this.props.configStore.clearLoginInfo();
+      this.props.history.push("/login");
+    } else {
+      this.getList();
     }
   };
   render() {
@@ -145,12 +230,13 @@ class Main extends React.Component {
       total,
       loading,
       modalTitle,
-      page
+      pageNumber,
+      editId
     } = this.state;
     const statusType = [
-      { label: "全部", value: "All" },
-      { label: "启用", value: "y" },
-      { label: "禁用", value: "n" }
+      { label: "全部", value: "" },
+      { label: "启用", value: 0 },
+      { label: "禁用", value: 1 }
     ];
     const columns = [
       {
@@ -160,25 +246,30 @@ class Main extends React.Component {
       },
       {
         title: "姓名",
-        key: "name",
-        dataIndex: "name"
+        key: "realName",
+        dataIndex: "realName"
+      },
+      {
+        title: "所属公司/单位",
+        key: "company",
+        dataIndex: "company"
       },
       {
         title: "手机",
-        key: "phone",
-        dataIndex: "phone"
+        key: "mobile",
+        dataIndex: "mobile"
       },
       {
         title: "注册时间",
-        key: "time",
-        dataIndex: "time",
+        key: "createDate",
+        dataIndex: "createDate",
         render: text => moment(text).format("YYYY-MM-DD HH:mm:ss")
       },
       {
-        title: "状态",
-        key: "status",
-        dataIndex: "status",
-        render: text => (text === "On" ? "启用" : "禁用")
+        title: "是否管理员",
+        key: "admin",
+        dataIndex: "admin",
+        render: text => (text ? "是" : "否")
       },
       {
         title: "操作",
@@ -187,20 +278,54 @@ class Main extends React.Component {
           <span>
             <a onClick={() => this.editUserInfo(record)}>编辑</a>
             <Divider type="vertical" />
-            <a onClick={() => this.showConfirm("确认重置该用户密码？")}>
+            <a
+              onClick={() =>
+                this.showConfirm({
+                  title: "确认重置该用户密码？",
+                  record,
+                  cb: this.resetPs
+                })
+              }
+            >
               重置密码
             </a>
             <Divider type="vertical" />
+            {!record.admin ? (
+              <a
+                onClick={() =>
+                  this.showConfirm({
+                    title: "确认设置该用户为管理员？",
+                    record,
+                    cb: this.setAdmin
+                  })
+                }
+              >
+                成为管理员
+              </a>
+            ) : (
+              <a
+                onClick={() =>
+                  this.showConfirm({
+                    title: "确认取消该用户管理员权限？",
+                    record,
+                    cb: this.setAdmin
+                  })
+                }
+              >
+                取消管理员
+              </a>
+            )}
+            <Divider type="vertical" />
             <a
               onClick={() =>
-                this.showConfirm(
-                  record.status !== "On"
-                    ? "确认启用该用户？"
-                    : "确认禁用该用户？"
-                )
+                this.showConfirm({
+                  title: "确认删除该账户？",
+                  record,
+                  cb: this.delAdmin
+                })
               }
             >
-              {record.status !== "On" ? "启用" : "禁用"}
+              删除
             </a>
           </span>
         )
@@ -252,12 +377,13 @@ class Main extends React.Component {
           loading={loading}
           total={total}
           changeSize={this.changeSize}
-          currentPage={page}
+          currentPage={pageNumber}
         />
         <EditModal
           wrappedComponentRef={v => (this.editModal = v)}
           title={modalTitle}
           submit={this.changeUserInfo}
+          id={editId}
         />
       </div>
     );

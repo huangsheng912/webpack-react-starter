@@ -8,9 +8,9 @@ axios.defaults.headers.post["Content-Type"] = "application/json"; //'application
 
 axios.interceptors.request.use(
   config => {
-    const configInfo = JSON.parse(sessionStorage.getItem("accountInfo")) || {};
+    const configInfo = JSON.parse(sessionStorage.getItem("configInfo")) || {};
     const token = configInfo.tokenId;
-    token && (config.headers.token = token);
+    token && (config.headers["Session-Key"] = token);
     return config;
   },
   e => Promise.error(e)
@@ -25,7 +25,7 @@ axios.interceptors.response.use(
     return Promise.resolve(response);
   },
   e => {
-    const { response } = e;
+    const { response, data = {} } = e;
     if (response) {
       switch (response.status) {
         // 404请求不存在
@@ -33,7 +33,16 @@ axios.interceptors.response.use(
           message.error("网络请求不存在");
           break;
         case 500:
-          message.error("服务器异常");
+          /* if (response.data && response.data.error && response.data.error.code === -32001) {
+            message.warning('登录失效，请重新登录');
+            window.location.href = '/login';
+          } */
+          const msg =
+            (response.data &&
+              response.data.error &&
+              response.data.error.message) ||
+            "服务器异常";
+          message.error(msg);
           break;
         default:
           message.error("未知异常");
@@ -66,10 +75,16 @@ export function get(url, params = {}) {
   });
 }
 
-export function post(url, params = {}) {
+export function post(url, method, params = {}) {
+  const data = {
+    jsonrpc: "2.0",
+    method,
+    params,
+    id: Math.floor(Math.random() * 1000)
+  };
   return new Promise((resolve, reject) => {
     axios
-      .post(url, params)
+      .post(url, data)
       .then(res => {
         resolve(res.data);
       })
@@ -93,22 +108,19 @@ export function put(url, params = {}) {
   });
 }
 
-export function rPost(url, methodName, data = []) {
+export function upload(url, data = []) {
   return new Promise((resolve, reject) => {
-    data.unshift(config.API_CHAIN_ID);
-    const params = {
-      jsonrpc: "2.0",
-      method: methodName,
-      params: data,
-      id: Math.floor(Math.random() * 1000)
-    };
-    axios.post(config.API_URL + url, params).then(
-      response => {
-        resolve(response.data);
-      },
-      err => {
-        reject(err);
-      }
-    );
+    axios
+      .post(url, data, {
+        headers: { "content-type": "multipart/form-data" }
+      })
+      .then(
+        response => {
+          resolve(response.data);
+        },
+        err => {
+          reject(err);
+        }
+      );
   });
 }

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Modal, Form, Input, message } from "antd";
-import { get } from "utils/request";
+import { post } from "utils/request";
 
 const formItemLayout = {
   labelCol: { span: 8 },
@@ -17,30 +17,42 @@ class EditModal extends Component {
     });
   };
   phoneChange = e => {
-    const value = e.target.value;
-    this.props.form.setFieldsValue({ userName: value });
+    // const value = e.target.value;
+    // this.props.form.setFieldsValue({'userName':value})
   };
   submit = () => {
     const { validateFields, getFieldsValue } = this.props.form;
+    console.log(this.props, 88);
     validateFields(async err => {
       if (!err) {
         const userInfo = getFieldsValue();
         this.setState({
           confirmLoading: true
         });
-        const url =
-          this.props.title === "用户信息"
-            ? "/usdi/account/edit"
-            : "/usdi/account/new";
-        const res = await get(url);
-        if (res.success) {
+        const method =
+          this.props.title === "编辑用户信息" ? "editAdmin" : "newAdmin";
+        const params =
+          this.props.title === "编辑用户信息"
+            ? { id: this.props.id, ...userInfo }
+            : userInfo;
+        try {
+          const res = await post("", method, params);
+          if (res.result) {
+            this.setState({
+              confirmLoading: false,
+              show: false
+            });
+            this.props.submit(userInfo);
+          } else {
+            this.setState({
+              confirmLoading: false
+            });
+          }
+        } catch (e) {
           this.setState({
             confirmLoading: false
           });
-          this.props.submit(userInfo);
-          this.visible();
-        } else {
-          message.error(res.msg);
+          console.log(e, 23456);
         }
       }
     });
@@ -95,7 +107,7 @@ class EditModal extends Component {
         afterClose={resetFields}
       >
         <Form.Item {...formItemLayout} label="手机">
-          {getFieldDecorator("phone", {
+          {getFieldDecorator("mobile", {
             rules: [
               {
                 required: true,
@@ -111,19 +123,19 @@ class EditModal extends Component {
           })(<Input placeholder="请输入手机号" onChange={this.phoneChange} />)}
         </Form.Item>
         <Form.Item {...formItemLayout} label="姓名">
-          {getFieldDecorator("name", {
+          {getFieldDecorator("realName", {
             rules: [
               {
                 required: true,
                 message: "请输入姓名"
-              },
+              }
               // {
               //   pattern: /^[!-~]{6,16}$/,
               //   message: '请输入4-16个英文，或2-8个中文'
               // },
-              {
+              /* {
                 validator: this.checkName
-              }
+              }*/
             ],
             validateTrigger: ["onBlur"]
           })(<Input placeholder="请输入姓名" />)}
@@ -134,13 +146,20 @@ class EditModal extends Component {
               {
                 required: true,
                 message: "请输入用户名"
-              },
-              // {
-              //   pattern: /^[!-~]{6,16}$/,
-              //   message: '请输入6-16个英文，或2-8个中文'
-              // },
-              {
+              }
+              /*{
                 validator: this.checkUserName
+              }*/
+            ],
+            validateTrigger: ["onBlur"]
+          })(<Input placeholder="请输入用户名" />)}
+        </Form.Item>
+        <Form.Item {...formItemLayout} label="公司/单位">
+          {getFieldDecorator("company", {
+            rules: [
+              {
+                required: true,
+                message: "请输入公司/单位名称"
               }
             ],
             validateTrigger: ["onBlur"]

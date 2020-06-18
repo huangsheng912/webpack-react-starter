@@ -5,32 +5,52 @@ import { Form, Input, Button, Icon, message } from "antd";
 import { post } from "utils/request";
 import { observer, inject } from "mobx-react";
 
+const formItemLayout = {
+  labelCol: { span: 8 },
+  wrapperCol: { span: 10 }
+};
+
 @Form.create()
 @inject("configStore")
 @observer
 class Login extends Component {
+  componentDidMount() {
+    window.addEventListener("keydown", this.keyDown, false);
+  }
+  componentWillUnmount() {
+    window.removeEventListener("keydown", this.keyDown, false);
+  }
+  keyDown = e => {
+    if (e && e.keyCode === 13) {
+      this.login();
+    }
+  };
+
   login = () => {
     const { validateFields, getFieldsValue } = this.props.form;
     validateFields(async err => {
       if (!err) {
         const userInfo = getFieldsValue();
-        const res = await post("/api/login", userInfo);
-        if (res.code === 200) {
-          if (!res.data.menus.length) {
-            message.error("获取菜单失败");
-            return;
-          }
+        const data = { type: "sys", ...userInfo };
+        const res = await post("", "login", data);
+        if (res.result) {
+          const data = res.result;
+          /* if (!data.menus || !data.menus.length) {
+            message.error('获取菜单失败');
+            return
+          }*/
           const configInfo = {
-            menuConfig: res.data.menus,
-            userName: res.data.userName,
-            nickName: res.data.nickName,
-            password: userInfo.password,
-            tokenId: res.data.token
+            menuConfig: data.menus,
+            userName: data.userName,
+            nickName: data.userName,
+            tokenId: data.sessionKey,
+            userId: data.id
           };
-          this.props.configStore.changeConfig(configInfo);
-          sessionStorage.setItem("accountInfo", JSON.stringify(configInfo));
-          const { redirect } = this.props.location.state || "/";
-          this.props.history.push(redirect);
+          this.props.configStore.changeConfig(configInfo); //会触发render中的redirect 不需再手动跳转路由
+          /*const state = this.props.location.state || {}
+          const redirect = state.redirect || '/'
+          console.log(redirect, 'redirect', this.props)
+          this.props.history.push(redirect)*/
         } else {
           message.error(res.msg);
         }
@@ -41,14 +61,16 @@ class Login extends Component {
     const { getFieldDecorator } = this.props.form;
     const { tokenId } = this.props.configStore;
     if (tokenId) {
-      return <Redirect to="/" />;
+      const state = this.props.location.state || {};
+      const redirect = state.redirect || "/";
+      return <Redirect to={redirect} />;
     }
     return (
       <div className="login">
         <div className="login-content">
-          <h3>USDI业务配置系统</h3>
+          <h3>慧景链管理平台</h3>
           <Form.Item>
-            {getFieldDecorator("userName", {
+            {getFieldDecorator("name", {
               rules: [{ required: true, message: "请输入用户名" }]
             })(
               <Input

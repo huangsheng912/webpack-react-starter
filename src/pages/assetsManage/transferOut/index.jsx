@@ -1,11 +1,10 @@
 import React from "react";
 import "./index.less";
-import { Button, Input, Select } from "antd";
+import { Button, Input, Select, Modal } from "antd";
 import { get } from "utils/request";
 import moment from "moment";
 import AddressModal from "./AddressModal";
 import Table from "components/Table";
-import { transformNum } from "../../../utils/util";
 
 const { Option } = Select;
 
@@ -27,10 +26,6 @@ class Main extends React.Component {
     };
     const res = await get("/usdi/assets/out/list", params);
     if (res.success) {
-      res.data.list.map(v => {
-        v.number = transformNum({ n: v.number, d: configInfo.usdiDecimals });
-        v.balance = transformNum({ n: v.balance, d: configInfo.usdiDecimals });
-      });
       this.setState({
         loading: false,
         total: res.data.total,
@@ -60,7 +55,7 @@ class Main extends React.Component {
       this.getList
     );
   };
-  changeSize = page => {
+  changeSize = (page, size) => {
     this.setState(
       {
         loading: true,

@@ -4,21 +4,21 @@ import { Table, Pagination } from "antd";
 class CommonTable extends Component {
   render() {
     const {
-      columns,
       dataSource = [],
       total,
-      loading,
       changeSize,
-      currentPage
+      currentPage,
+      ...rest
     } = this.props;
     return (
       <div className="common-table">
         <Table
-          columns={columns}
+          // columns={columns}
           dataSource={dataSource}
-          rowKey={() => Math.random() * 1000}
+          rowKey={record => Math.random() * 1000}
           pagination={false}
-          loading={loading}
+          // loading={loading}
+          {...rest}
         />
         <Pagination
           total={total}

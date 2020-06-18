@@ -1,6 +1,7 @@
 import Loadable from "react-loadable";
+import React from "react";
 
-const loadable = function(loader) {
+const LoadableBar = function(loader) {
   return Loadable({
     loader,
     loading() {
@@ -8,99 +9,115 @@ const loadable = function(loader) {
     }
   });
 };
-const DataOverview = loadable(() => import("page/dashBoard/dataOverview"));
-const AccountAddress = loadable(() => import("page/dashBoard/accountAddress"));
-const Redemption = loadable(() => import("page/dashBoard/redemption"));
-const RewardDetail = loadable(() => import("page/dashBoard/rewardDetail"));
-const RewardDistribution = loadable(() =>
-  import("page/dashBoard/rewardDistribution")
+const ScenicData = LoadableBar(() => import("page/scenicManage/scenicData"));
+const Audit = LoadableBar(() => import("page/scenicManage/audit"));
+const ScenicInfo = LoadableBar(() => import("page/scenicManage/scenicInfo"));
+const PunchPoint = LoadableBar(() => import("page/scenicManage/punchPoint"));
+const WallInfo = LoadableBar(() => import("page/scenicManage/wallInfo"));
+
+const EditScenic = LoadableBar(() =>
+  import("page/scenicManage/scenicInfo/editScenic")
 );
-const RewardDistributionDetail = loadable(() =>
-  import("page/dashBoard/rewardDistribution/detail")
+const AddScenic = LoadableBar(() =>
+  import("page/scenicManage/scenicInfo/addScenic")
+);
+const AuditScenic = LoadableBar(() =>
+  import("page/scenicManage/scenicInfo/auditScenic")
 );
 
-const TransferOut = loadable(() => import("page/assetsManage/transferOut"));
-const Broadcast = loadable(() => import("page/assetsManage/broadcast"));
-const Redeem = loadable(() => import("page/assetsManage/redeem"));
+const AddPunchPoint = LoadableBar(() =>
+  import("page/scenicManage/punchPoint/addPunchPoint")
+);
+const EditPunchPoint = LoadableBar(() =>
+  import("page/scenicManage/punchPoint/editPunchPoint")
+);
+const Profit = LoadableBar(() => import("page/assetsManage/profit"));
+const Integral = LoadableBar(() => import("page/assetsManage/integral"));
 
-const Parameter = loadable(() => import("page/configurationManage/parameter"));
-
-const AccountManage = loadable(() => import("page/systemManage/accountManage"));
-
+const AccountManage = LoadableBar(() =>
+  import("page/systemManage/accountManage")
+);
+console.log(PunchPoint, 123, ScenicInfo);
 const config = [
   {
-    title: "数据看板",
-    icon: "dashboard",
-    value: "dashBoard",
+    title: "景区管理",
+    icon: "control",
+    value: "scenicManage",
     children: [
-      {
-        title: "数据概览",
-        value: "/dashBoard/dataOverview",
-        component: DataOverview
+      /*{
+        title: '景区数据',
+        value: '/scenicManage/scenicData',
+        component: ScenicData
       },
       {
-        title: "账户地址",
-        value: "/dashBoard/accountAddress",
-        component: AccountAddress
+        title: '入驻审核',
+        value: '/scenicManage/audit',
+        component: Audit
+      },*/
+      {
+        title: "景区信息",
+        value: "/scenicManage/scenicInfo",
+        component: ScenicInfo
       },
       {
-        title: "兑换赎回",
-        value: "/dashBoard/redemption",
-        component: Redemption
-      },
-      {
-        title: "奖励明细",
-        value: "/dashBoard/rewardDetail",
-        component: RewardDetail
-      },
-      {
-        title: "奖励发放",
-        value: "/dashBoard/rewardDistribution",
-        component: RewardDistribution
-      },
-      {
-        title: "奖励发放明细",
-        value: "/dashBoard/rewardDistribution/detail",
-        component: RewardDistributionDetail,
+        title: "新增景区",
+        value: "/scenicManage/scenicInfo/addScenic",
         detail: true,
-        parent: "/dashBoard/rewardDistribution"
-      }
-    ]
-  },
-  {
-    title: "资产管理",
-    icon: "account-book",
-    value: "assetsManage",
-    children: [
-      {
-        title: "资金转出",
-        value: "/assetsManage/transferOut",
-        component: TransferOut
+        component: AddScenic
       },
       {
-        title: "冷钱包交易记录",
-        value: "/assetsManage/broadcast",
-        component: Broadcast
+        title: "编辑景区",
+        value: "/scenicManage/scenicInfo/editScenic",
+        detail: true,
+        component: EditScenic
       },
       {
-        title: "大额赎回处理",
-        value: "/assetsManage/redeem",
-        component: Redeem
-      }
-    ]
-  },
-  {
-    title: "配置管理",
-    icon: "database",
-    value: "configurationManage",
-    children: [
+        title: "审核景区",
+        value: "/scenicManage/scenicInfo/auditScenic",
+        detail: true,
+        component: AuditScenic
+      },
       {
-        title: "参数配置",
-        value: "/configurationManage/parameter",
-        component: Parameter
+        title: "打卡点管理",
+        value: "/scenicManage/punchPoint",
+        component: PunchPoint
+      },
+      {
+        title: "新增打卡点",
+        value: "/scenicManage/punchPoint/addPunchPoint",
+        detail: true,
+        component: AddPunchPoint
+      },
+      {
+        title: "编辑打卡点",
+        value: "/scenicManage/punchPoint/editPunchPoint",
+        detail: true,
+        component: EditPunchPoint
       }
+      /*{
+        title: '上墙信息',
+        value: '/scenicManage/wallInfo',
+        component: WallInfo
+      }*/
     ]
   },
+  /*{
+    title: '资产管理',
+    icon: 'account-book',
+    value:'assetsManage',
+    children:[
+      {
+        title: '利润明细',
+        value: '/assetsManage/profit',
+        component: Profit
+      },
+      {
+        title: '积分明细',
+        value: '/assetsManage/integral',
+        component: Integral
+      }
+    ]
+  },*/
   {
     title: "系统管理",
     icon: "setting",
@@ -110,32 +127,14 @@ const config = [
         title: "账号管理",
         value: "/systemManage/accountManage",
         component: AccountManage
-        /*title: '系统管xxx理',
-        icon: 'setting',
-        value:'2',
-        children:[
-          {
-            title: '系统管xaaxx理',
-            icon: 'setting',
-            value:'3',
-            children:[
-              {
-                title: '系统管xssxx理',
-                value: '/systemManage/2/3/accountManage',
-                component: AccountManage
-              }
-            ]
-          }
-        ]*/
       }
+      /*{
+        title: '系统设置',
+        value: '/assetsManage/setting',
+        component: Setting
+      }*/
     ]
   }
-  // {
-  //   title: '广播交易',
-  //   value:'/broadcast',
-  //   icon: 'notification',
-  //   component: Broadcast
-  // },
 ];
 
 export default config;

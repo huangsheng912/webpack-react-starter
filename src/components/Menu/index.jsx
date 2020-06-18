@@ -2,13 +2,11 @@ import React from "react";
 import Loadable from "react-loadable";
 import "./index.less";
 import config from "../../router/config";
-import logo from "src/images/img2.png";
 import { Redirect, Route, Switch } from "react-router-dom";
-import { get } from "utils/request";
+import { post } from "utils/request";
 import AsyncComponent from "page/AsyncComponent";
 import { observer, inject } from "mobx-react";
 import { toJS } from "mobx";
-// import loadable from '@loadable/component'
 import {
   Layout,
   Menu,
@@ -48,10 +46,10 @@ class PasswordModal extends React.Component {
           confirmLoading: true
         });
         const isSuccess = await this.props.confirm(info);
+        this.setState({
+          confirmLoading: false
+        });
         if (isSuccess) {
-          this.setState({
-            confirmLoading: false
-          });
           this.visible();
         }
       }
@@ -83,7 +81,7 @@ class PasswordModal extends React.Component {
         afterClose={resetFields}
       >
         <Form.Item {...formItemLayout} label="原密码">
-          {getFieldDecorator("password", {
+          {getFieldDecorator("oldPassword", {
             rules: [
               {
                 required: true,
@@ -109,7 +107,7 @@ class PasswordModal extends React.Component {
           })(<Input type="password" placeholder="请输入新密码" />)}
         </Form.Item>
         <Form.Item {...formItemLayout} label="重复新密码">
-          {getFieldDecorator("confirm", {
+          {getFieldDecorator("password", {
             rules: [
               {
                 required: true,
@@ -150,7 +148,7 @@ class RenderRoute extends React.Component {
         });
         // const LoadableBar = AsyncComponent(() => import("../../pages" + v.value))
         return (
-          <Route exact path={v.value} key={v.value} component={LoadableBar} />
+          <Route exact path={v.value} key={v.value} component={v.component} />
         );
       }
       return this.renderRoute(v.children);
@@ -201,7 +199,7 @@ class TabRoute extends React.Component {
     );
   }
 }
-const accountInfo = JSON.parse(sessionStorage.getItem("accountInfo")) || {};
+
 @inject("configStore")
 @observer
 class MenuBar extends React.Component {
@@ -223,16 +221,14 @@ class MenuBar extends React.Component {
     // console.log(toJS(this.props.configStore.routeInfo), '-=--==routeInfo')
     this.getDefaultKeys();
   }
-  // static getDerivedStateFromProps(nextProps, prevState){
-  //   console.log(nextProps,888,prevState)
-  //   return null
-  // }
-  UNSAFE_componentWillReceiveProps(nextProps, nextContext) {
-    if (nextProps.location.pathname === "/") return;
-    this.props.configStore.changeRoute(
-      nextProps.location.pathname + nextProps.location.search
-    );
-    // console.log(nextProps,456,this.props)
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    // console.log(prevProps,1,prevState,2,this.props,3,this.state,4,location.pathname)
+    if (prevProps.location.pathname !== this.props.location.pathname) {
+      this.props.configStore.changeRoute(
+        this.props.location.pathname + this.props.location.search
+      );
+    }
   }
 
   //初始化时获取默认展开菜单和默认打开页面
@@ -315,22 +311,31 @@ class MenuBar extends React.Component {
     this.psModal.visible();
   };
 
-  changePassword = async () => {
-    const res = await get("/usdi/account/list");
-    if (res.success) {
-      message.success("修改成功，请重新登录");
-      this.props.configStore.clearLoginInfo();
-      sessionStorage.removeItem("accountInfo");
-      this.props.history.push("/login");
-      return true;
-    } else {
-      message.error(res.msg);
+  changePassword = async info => {
+    const id = this.props.configStore.configInfo.userId;
+    const { newPassword, oldPassword } = info;
+    try {
+      const res = await post("", "modifyPwd", { id, newPassword, oldPassword });
+      if (res.result && res.result.result) {
+        message.success("修改成功，请重新登录");
+        this.logOut();
+        return true;
+      } else {
+        message.error(res.msg);
+        return false;
+      }
+    } catch (e) {
+      return false;
     }
   };
   logOut = () => {
     this.props.configStore.clearLoginInfo();
-    sessionStorage.removeItem("accountInfo");
-    this.props.history.push("/login");
+    this.props.history.push({
+      pathname: "/login",
+      state: {
+        redirect: location.pathname + location.search
+      }
+    });
   };
   //默认重定向路径
   getDefaultRoute = config => {
@@ -343,13 +348,19 @@ class MenuBar extends React.Component {
     return defaultRoute;
   };
   render() {
-    const { breadCrumb, selectKey, tabData } = this.props.configStore;
+    const {
+      breadCrumb,
+      selectKey,
+      tabData,
+      configInfo
+    } = this.props.configStore;
     const { collapsed, openKeys } = this.state;
     const dropMenu = (
       <Menu>
-        {/*<Menu.Item onClick={this.showPsModal}>
-          <Icon type='setting'/>修改密码
-        </Menu.Item>*/}
+        <Menu.Item onClick={this.showPsModal}>
+          <Icon type="setting" />
+          修改密码
+        </Menu.Item>
         <Menu.Item onClick={this.logOut}>
           <Icon type="logout" />
           退出
@@ -361,8 +372,8 @@ class MenuBar extends React.Component {
         <Layout>
           <Sider trigger={null} collapsible collapsed={collapsed} width={256}>
             <div className="logo">
-              <img src={logo} alt="" />
-              {!collapsed ? <span>USDI业务配置系统</span> : null}
+              {/*<img src={logo} alt="" />*/}
+              {!collapsed ? <span>慧景链管理平台</span> : null}
             </div>
             <Menu
               theme="dark"
@@ -386,15 +397,14 @@ class MenuBar extends React.Component {
               <Dropdown className="fr click" overlay={dropMenu}>
                 <span>
                   <Avatar style={{ backgroundColor: "#87d068" }} icon="user" />
-                  {accountInfo.userName}
+                  {configInfo.userName}
                 </span>
               </Dropdown>
             </Header>
-            <TabRoute
-              tabData={tabData}
-              clickTab={this.clickTab}
-              closeTab={this.closeTab}
-            />
+            {/*<TabRoute tabData={tabData}
+                      clickTab={this.clickTab}
+                      closeTab={this.closeTab}
+            />*/}
             <Content>
               <RenderRoute
                 config={this.menuConfig}

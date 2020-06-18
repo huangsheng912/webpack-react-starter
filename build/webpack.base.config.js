@@ -6,7 +6,7 @@ const Happypack = require("happypack");
 const os = require("os");
 const happyThreadPool = Happypack.ThreadPool({ size: os.cpus().length });
 const dev = process.env.NODE_ENV === "development";
-const AntdDayjsWebpackPlugin = require("antd-dayjs-webpack-plugin");
+// const AntdDayjsWebpackPlugin = require("antd-dayjs-webpack-plugin");
 
 module.exports = {
   entry: {},
@@ -17,11 +17,11 @@ module.exports = {
   resolve: {
     extensions: [".jsx", ".js", ".less", ".css", "json"], //设置引入文件可省略的拓展名
     alias: {
-      src: path.resolve(__dirname, "../src"), //设置引入路径别名
-      page: path.resolve(__dirname, "../src/pages"),
-      utils: path.resolve(__dirname, "../src/utils"),
-      components: path.resolve(__dirname, "../src/components"),
-      // "react-dom": "@hot-loader/react-dom" //menu 通过map动态import路由+react-hot-loader实现热替换异常，添加后热更新都出问题
+      "src": path.resolve(__dirname, "../src"), //设置引入路径别名
+      "page": path.resolve(__dirname, "../src/pages"),
+      "utils": path.resolve(__dirname, "../src/utils"),
+      "components": path.resolve(__dirname, "../src/components"),
+      "react-dom": "@hot-loader/react-dom" //menu 通过map动态import路由+react-hot-loader实现热替换异常，添加后热更新都出问题
     },
     modules: ["node_modules"] //webpack解析模块时应该搜索的目录
   },
@@ -117,7 +117,7 @@ module.exports = {
         NULS_ENV: JSON.stringify(process.env.NODE_ENV)
       }
     }),
-    new AntdDayjsWebpackPlugin() //使用day.js代替moment，减少打包体积
+    // new AntdDayjsWebpackPlugin() //使用day.js代替moment，减少打包体积
   ],
   performance: false // 关闭性能提示
 };

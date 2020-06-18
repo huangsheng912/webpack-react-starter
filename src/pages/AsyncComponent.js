@@ -1,8 +1,9 @@
 import React from "react";
+
 export default function(componentFactory) {
   class AsyncComponent extends React.Component {
-    constructor() {
-      super();
+    constructor(props) {
+      super(props);
       this.state = { component: null };
     }
     async componentDidMount() {

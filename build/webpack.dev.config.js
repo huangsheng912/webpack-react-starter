@@ -34,14 +34,20 @@ module.exports = merge(commonConfig, {
       // 代理到后端的服务地址
       "/api": {
         target: "http://api.rap.nuls.center/app/mock/18",
-        changeOrigin: true, //是否跨域
-        pathRewrite: { "^/api": "" }
-      }
+        pathRewrite: {"^/api" : ""},
+        changeOrigin: true,
+      },
+      "/jsonrpc": {
+        // target: "http://192.168.1.130:18081",
+        target: "https://hj.yuyanji360.com",
+        // pathRewrite: {"^/dev" : ""},
+        changeOrigin: true,
+      },
     }
   },
   plugins: [
     //开启HMR(热替换功能,替换更新部分,不重载页面！) devServer中设置hot后该插件自动开启
     new webpack.HotModuleReplacementPlugin(),
-    new openBrowserPlugin({url: "http://127.0.0.1:" + PORT})
+    new openBrowserPlugin({url: "http://localhost:" + PORT})
   ]
 });
