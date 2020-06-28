@@ -2,9 +2,9 @@ const path = require("path");
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const Happypack = require("happypack");
+const HappyPack = require("happypack");
 const os = require("os");
-const happyThreadPool = Happypack.ThreadPool({ size: os.cpus().length });
+const happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length });
 const dev = process.env.NODE_ENV === "development";
 // const AntdDayjsWebpackPlugin = require("antd-dayjs-webpack-plugin");
 
@@ -96,7 +96,7 @@ module.exports = {
       template: path.resolve(__dirname, "../src/index.html") // 指定模板路径
       // favicon: path.resolve(__dirname,'../src/images/favicon.ico') //favicon.ico文件路径
     }),
-    new Happypack({
+    new HappyPack({
       //用id来标识 happypack处理那里类文件
       id: "js",
       //如何处理  用法和loader 的配置一样

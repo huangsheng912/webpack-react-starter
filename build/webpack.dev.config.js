@@ -10,7 +10,10 @@ module.exports = merge(commonConfig, {
   mode: "development",
   devtool: "cheap-module-source-map",
   entry: {
-    app: ["react-hot-loader/patch", path.resolve(__dirname, "../src/main.js")]
+    app: [
+      "react-hot-loader/patch", //react-hot-loader
+      path.resolve(__dirname, "../src/main.js")
+    ]
   },
   output: {
     filename: "[name].js"
