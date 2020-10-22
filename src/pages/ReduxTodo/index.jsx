@@ -6,6 +6,7 @@ import img1 from "src/images/img1.png";
 import img2 from "src/images/img2.png";
 import img3 from "src/images/img3.png";
 import { throttle } from "../../utils/util";
+import ImageCompression from "./component/ImageCompression";
 
 import html2canvas from "html2canvas";
 import QRCode from "qrcode";
@@ -117,6 +118,7 @@ class Index extends Component {
     }
     return (
       <div style={{ width: "600px", margin: "200px auto" }} id="test-page">
+        <ImageCompression />
         <div className="html-canvas-test" ref={v => (this.htmlCanvas = v)}>
           <img alt="" ref={v => (this.img = v)} style={{ width: "132px" }} />
           <AddTodo />

@@ -84,5 +84,5 @@ class AppForRedux extends React.Component {
   }
 }
 
-// export default hot(AppForRedux);
-export default hot(App);
+export default hot(AppForRedux);
+// export default hot(App);
